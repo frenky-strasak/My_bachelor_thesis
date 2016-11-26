@@ -1,0 +1,87 @@
+------ How to evaluate dataset ------
+1. Run bro program with pcap file. It ctreates bro folder with bro logs in the folder where you can find pcap file and binetflow.
+2. Next run program Features_evaluating.
+
+In the dataset folder shoulf be at laest:
+ - bro folder with bro logs
+ - pcap file
+ - binetflow
+
+--------------------------------------------------
+
+
+---10.rijen 2016---
+Running:
+python main path inefcted_ip1 inefcted_ip2 ... inefcted_ipN
+
+Současnej problém:
+Labelovaný pcap data ze sebasových stránek obsahují jen pcap s botnet traffic a normal traffic vůbec neobsahují.
+Celá traffic je jen v binetflowu, kde jsou namixovaný normal a botnet (zkrátka klasika).
+Vadí, že bro logy jsem udelal jen z pcap, kde je jen botnet traffic?
+
+- Ne nevadí... znamená to teda, že všechny flowy z toho pcap mají label botnet?
+    - to nevim.. to over...
+
+Nejvetsi problem:
+- z toho 1. datasetu je ipaddresa infikovanýho pc 147.32.84.165. Ale tady ta adresa se pripojuje na spoustu dalsich adres,
+ktere jsou labelovaný jako Botnet.. co s tim? jsou to jen potomci té první ip adresy? nebo se malware připojuje na spoustu ip adres?
+
+
+29.10.2016
+----------------------
+
+Mám k dispozici data:
+                - pcap file, prý jen s botnet traffic
+                - binetflow file, kde je i normal traffic a hl. ty flowy jsou labelovaný...
+
+Co já chci:
+        - udělat "model of unit" = {SrcIP, DstIP, DstPort, Protocol}
+        - což znamená, že když jeden malware se připojuje k více adresám, každá jiná adresa má jinej "model of unit".
+        - Vadí to?
+                - asi záleží co chceme detekovat.. zda malware flow nebo malware
+
+Úrovně:
+    1. Malware - (malware má mnoho 4-tuples lišící se třeba jen v protokolu nebo DstIpadress)
+        2. 4-tuples = {SrcIP, DstIP, DstPort, Protocol} - (má mnoho flows)
+            3. flows - (má mnoho features jako size...)
+
+Co ted?:
+    - Teď uděláme 4-tuples. Jak?:
+                                1. z binetflowu vyberu všechny infikovaný dvojice ipAddress
+                                2. pak otevřu conn.log a pudu tvořit 4-tuples
+
+26.11. 2016
+----------------------------------
+
+Je nutne se ptat na druhou variaci SrcIP, DstIP?
+        - Pokud z lablovanych dat mame urcitou variaci SrcIP a DstIP, pak si myslim, ze neni nutne se ptat zaroven
+        na jejich druhou variacu DstIP, SrcIP, ptz pokud je i takova to variace malware (jakoze urcite je), tak by mela
+        byt olablovana taky. Budem tem lablum ykratka verit...
+
+
+Dnesni plan:
+    - github?
+    - robeni na featurech
+    - grafy
+
+
+Main.py :
+    1) GetInfectedIPs.py : Jde do binetflowu a tam si zjisti, ktery ip adresy(Src, Dst) jsou infikovany.
+    2) ProccessLogs.py : Projdeme conn.log a vytváříme z toho 4-tuples a zároveň tvoří dostupné features.
+                         Pak projdeme ssl.log, kde dany ssl.log line pridame do daneho 4-tuplu podle ip adres.
+    3) Kontrolujeme, zda kazdej 4-tuple ma budto same malware a nebo jenom same normal
+
+
+------------------------------------------------------------
+Co dale ?
+Koukni na featury z connlogu a ssllogu... je to mrte zajimavy a zkus vytvorit featuru/y pro handshaky a pro state of connection...
+conn.log:
+https://www.bro.org/sphinx/scripts/base/protocols/conn/main.bro.html#type-Conn::Info
+ssl.log:
+https://www.bro.org/sphinx/scripts/base/protocols/ssl/main.bro.html#type-SSL::Info
+
+
+
+
+
+

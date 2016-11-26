@@ -1,0 +1,25 @@
+--------------------------- Features -----------------------------------
+
+Connection features:
+    1. Number of flows
+    2. Total size of all flows
+    3. Number of ssl logs
+    4. Total size of ssl logs
+    5. Number of ssl handshakes in one connection
+    6. List of offered ciphersuites
+    7. List of advertised extension
+
+
+Flow features:
+    1. Duration of a flow
+    2. Size of a flow
+    3. Periodicity of flows
+    4. Differences of sizes of flows
+    5. State of connection (S_, SA_)
+    6. Differences of sizes of ssl logs
+    7. Size of public key
+    8. Cipher
+    9. Version of ssl
+   10. Certificate
+   11. One certificate for more domains
+   12. A flow has port 443 but there is no such ssl log
