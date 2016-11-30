@@ -23,3 +23,46 @@ Flow features:
    10. Certificate
    11. One certificate for more domains
    12. A flow has port 443 but there is no such ssl log
+
+
+- Je důležitý se zaměřit na ssl, ptotože klasický featury už má sebas zmáklý (SIZE, DURATION a PERIODICITY)
+
+Connection features:
+    1. Number of ssl logs
+    2. Total size of ssl logs
+    3. Number of ssl handshakes in one connection
+    4. List of offered ciphersuites
+    5. List of advertised extension
+    6. State of connection (S_, SA_)
+    7. Size of public key
+    8. Version of ssl
+    9. One certificate for more domains
+   10. A flow has port 443 but there is no such ssl log
+
+
+Conn.log file intersting feature:
+1. service: An identification of an application protocol being sent over the connection
+2. conn_state: S0, S1, ...
+3. local_orig: If the connection is originated locally, this value will be T.
+    If it was originated remotely it will be F. In the case that the Site::local_nets variable is undefined,
+    this field will be left empty at all times.
+4. local_resp: If the connection is responded to locally, this value will be T.
+    If it was responded to remotely it will be F. In the case that the Site::local_nets variable is undefined,
+    this field will be left empty at all times.
+5. missed_bytes
+6. history of connection states
+
+
+SSL.log file intersting features:
+1. version: SSL/TLS version that the server chose.
+2. cipher: SSL/TLS cipher suite that the server chose.
+3. curve: Elliptic curve the server chose when using ECDH/ECDHE. (it is almost nowhere!!)
+4. server_name: Value of the Server Name Indicator SSL/TLS extension. It indicates the server name that the client was requesting.
+5. resumed: Flag to indicate if the session was resumed reusing the key material exchanged in an earlier connection.
+6. established: Flag to indicate if this ssl session has been established successfully, or if it was aborted during the handshake.
+7. cert_chain_fuids: An ordered vector of all certificate file unique IDs for the certificates offered by the server.
+8. client_cert_chain_fuids: An ordered vector of all certificate file unique IDs for the certificates offered by the client.
+9. subject: Subject of the X.509 certificate offered by the server.
+10. issuer: Subject of the signer of the X.509 certificate offered by the server.
+
+X.509. log is about certificate:

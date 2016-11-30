@@ -71,7 +71,7 @@ Main.py :
     3) Kontrolujeme, zda kazdej 4-tuple ma budto same malware a nebo jenom same normal
 
 
-------------------------------------------------------------
+---
 Co dale ?
 Koukni na featury z connlogu a ssllogu... je to mrte zajimavy a zkus vytvorit featuru/y pro handshaky a pro state of connection...
 conn.log:
@@ -80,7 +80,26 @@ ssl.log:
 https://www.bro.org/sphinx/scripts/base/protocols/ssl/main.bro.html#type-SSL::Info
 
 
+28.11.2016
+--------------------------------------------------
+ 1. S čim dnes začít ?
+        - rozjet na plno grafy
+        - začít porovnávat featury
+
+ 2. Jak bude porovnávání features vypadat?
+        - jednotlivý 4-tuples: červený = malware, modrý = normal
+        - jsou 1.dim, 2 dim, 3 dim a chtěl bych n-dim
 
 
+Feature #1:
+osa x: pocet flows
+osa y: pocet ssl logu
 
+29.11.2016
+--------------------------------------------------
+- vylepsil jsem projekt aby to davalo trochu smysl
+- vymyslet nejakou dobrou featuru a porovnat
+
+Feature #2:
+porovani states_of_connection mezi MALWARE a NORMAL
 

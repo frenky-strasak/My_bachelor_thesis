@@ -1,17 +1,38 @@
-import numpy as np
-import matplotlib.pyplot as plt
 
-z = np.arange(-2, 2, .1)
-zero = np.zeros(len(z))
-y = np.max([zero, z], axis=0)
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
-ax.plot(z, y)
-ax.set_ylim([-2.0, 2.0])
-ax.set_xlim([-2.0, 2.0])
-ax.grid(True)
-ax.set_xlabel('z')
-ax.set_title('Rectified linear unit')
+temp = dict.fromkeys(["a", "b", "c"], True)
 
-plt.show()
+
+print temp
+
+
+
+# class Base(object):
+#     def __init__(self):
+#         self.name = None
+#
+#     def get_name(self):
+#         return self.name
+#
+#     def smrdis(self):
+#         print "je to: ", self.name
+#
+#
+# class Derivate(Base):
+#     def __init__(self, n1, n2):
+#         super(Derivate, self).__init__()
+#         self.n1 = n1
+#         self.n2 = n2
+#
+#     def set_name(self):
+#         self.name = "ahoj svete"
+#
+#     def get_name(self):
+#         return self.name
+#
+#
+# if __name__ == "__main__":
+#     temp = Derivate(1,2)
+#     temp.set_name()
+#     print temp.get_name()
+#     temp.smrdis()
