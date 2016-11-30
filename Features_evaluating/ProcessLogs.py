@@ -1,12 +1,16 @@
-import ComputeFeatures
+"""
+This file goes into logs file and creates "connection 4-tuples" objects.
+"""
+from EvaluateData import EvaluateData
+from Connection_4_tuple import Connection4tuple
 # This class, there are all methods for proccessing LogFiles.
 
 
-class ProcessLog:
+class ProcessLogs(EvaluateData):
     def __init__(self, path_to_folder, infected_ips_list):
+        super(ProcessLogs, self).__init__()
         self.path_to_folder = path_to_folder
         self.infected_ips_list = infected_ips_list
-        self.connection_4_tuple = dict()
         self.conn_log = None
         self.karel = 0
 
@@ -29,13 +33,13 @@ class ProcessLog:
                 ipaddresses = split[2], split[4]
                 ipaddresses_reverse = split[4], split[2]
 
-                if connection_index not in self.connection_4_tuple.keys():
-                    self.connection_4_tuple[connection_index] = ComputeFeatures.ComputeFeatures(connection_index)
+                if connection_index not in self.connection_4_tuples.keys():
+                    self.connection_4_tuples[connection_index] = Connection4tuple(connection_index)
 
                 if ipaddresses in self.infected_ips_list:
-                    self.connection_4_tuple[connection_index].add_flow(line, "MALWARE")
+                    self.connection_4_tuples[connection_index].add_flow(line, "MALWARE")
                 else:
-                    self.connection_4_tuple[connection_index].add_flow(line, "NORMAL")
+                    self.connection_4_tuples[connection_index].add_flow(line, "NORMAL")
 
         f.close()
 
@@ -51,34 +55,29 @@ class ProcessLog:
                 split = line.split('	')
                 ssl_uid = split[1]
 
-                for key in self.connection_4_tuple.keys():
-                    if ssl_uid in self.connection_4_tuple[key].get_uid_flow_list():
-                        self.connection_4_tuple[key].add_ssl_log(line)
+                for key in self.connection_4_tuples.keys():
+                    if ssl_uid in self.connection_4_tuples[key].get_uid_flow_list():
+                        self.connection_4_tuples[key].add_ssl_log(line)
                         number_adding_ssl += 1
-
-        # print "Pocet pridanych ssl logu: ", number_adding_ssl
+        f.close()
+        print "     << ProcessLog.py: Pocet pridanych ssl logu: ", number_adding_ssl
 
     def print_connection_4_tuple(self):
-        for key in self.connection_4_tuple.keys():
-            self.connection_4_tuple[key].print_features()
+        for key in self.connection_4_tuples.keys():
+            self.connection_4_tuples[key].print_features()
 
     # This method checks error in connection 4-tuple.
     # So if 4-tuple contains some malware flows and some normal flow, that is error!!!
     def check_4_tuples(self):
         print "<< ProcessLogs.py: Checking connections..."
         no_variants = 0
-        for key in self.connection_4_tuple.keys():
-            if self.connection_4_tuple[key].get_malware_label() != 0 and \
-                            self.connection_4_tuple[key].get_normal_label() != 0:
-                    print "Tuple index: ", self.connection_4_tuple[key].tuple_index
-                    print "Number of malware: ", self.connection_4_tuple[key].get_malware_label()
-                    print "Number of normal: ", self.connection_4_tuple[key].get_normal_label()
+        for key in self.connection_4_tuples.keys():
+            if self.connection_4_tuples[key].get_malware_label() != 0 and \
+                            self.connection_4_tuples[key].get_normal_label() != 0:
+                    print "Tuple index: ", self.connection_4_tuples[key].tuple_index
+                    print "Number of malware: ", self.connection_4_tuples[key].get_malware_label()
+                    print "Number of normal: ", self.connection_4_tuples[key].get_normal_label()
                     no_variants += 1
 
         if no_variants == 0:
             print "     << ProcessLog.py: Connections are ok. Each connection has 0 malwares or 0 normal."
-
-    def get_size_of_con4tuple(self):
-        return len(self.connection_4_tuple)
-
-
