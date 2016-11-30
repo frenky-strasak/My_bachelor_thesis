@@ -1,4 +1,6 @@
-# This file goes to binetflow file, where you can find labels for each flow. It gives you all infected ip addresses.
+"""
+This file goes to binetflow file, where you can find labels for each flow. It gives you all infected ip addresses.
+"""
 import sys
 import glob
 
