@@ -1,6 +1,9 @@
+"""
+python Main.py path_to_data_set
+"""
 import sys
 import GetInfectedIPs
-import ProcessLogs
+from ProcessLogs import ProcessLogs
 
 if __name__ == "__main__":
     # 0. argument is name of the file
@@ -19,7 +22,11 @@ if __name__ == "__main__":
     infected_ips = GetInfectedIPs.get_infected_ips(path)
 
     # 2. Create 4-tuples, evaluate features and labeled them
-    process_logs = ProcessLogs.ProcessLog(path, infected_ips[0])
+    process_logs = ProcessLogs(path, infected_ips[0])
     process_logs.evaluate_features()
     # process_logs.print_connection_4_tuple()
     process_logs.check_4_tuples()
+    # Create plot data for current featues
+    process_logs.create_plot_data()
+
+
