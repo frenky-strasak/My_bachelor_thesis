@@ -90,7 +90,7 @@ Once you choose one of these Main files and it creates the resulting
 
 There are several scripts for plotting and each of them plots something different.
 It depends which feature you computes and which resulting 'plot data file' you created.
-
+ 
 Example:
 The first evaluate feature is 'State of connection'. 
 So for plotting this feature you call: 'python ShowFigureBar.py' name_of_resulting_plot_data.txt
