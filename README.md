@@ -25,15 +25,15 @@ What is dataset?
 I define two types of dat sets: 'single dataset' and 'multi dataset'.
 ##### Single data set
 It is folder which has to contain following attributes:
-1. Pcap file
+######1. Pcap file
    You can get it from Wireshark, which is able to store your internet
    traffic in packets.
    https://www.wireshark.org/
-2. Labeled binetflow file
+######2. Labeled binetflow file
    Argus is able to extract the pcap file to binetflow file. There are just
    flows but no payload data which are sensitive.
    http://qosient.com/argus/
-3. Bro folder
+######3. Bro folder
    Bro folder contains several logs file and each of them describes some
    level in internet traffic (conn.log, dns.log, ssl.log, ...). There is no
    sensitive data.
@@ -58,18 +58,18 @@ Invent some new features is the main target of this project. At the end we shoul
 the best of them.
 
 List of current modules for features:
-1. 'State of connection'
+######1. 'State of connection'
 states: S0, S1, SF, REJ, S2, S3, RSTO, RSTR, RSTOS0, RSTRH, SH, SHR, OTH,
 module for creating plot data: 'create_plot_data_file_2()' in 'EvaluateData.py'
 script for plotting: 'ShowFigureBar.py'
 
 ###Usage
 First of fall you should set configure file. There is two values:
-1. path_to_single_dataset - It is path to your single data set.
-2. path_to_multi_dataset - It is path to your multi data set. 
+######1. path_to_single_dataset - It is path to your single data set.
+######2. path_to_multi_dataset - It is path to your multi data set. 
 
 There are 2 options: 'Main_single.py' and 'Main_multi.py'.
-1. python  Main_single.py  name_of_created_plot_data.txt
+######1. python  Main_single.py  name_of_created_plot_data.txt
 First it takes your argument, which is name of the result. If there is no 
 argument, the name of the result data file will be default 'new_plot_data.txt'.
 Next it looks into config file for 'path_to_single_dataset', which is path to 'single data file'.
@@ -79,7 +79,8 @@ which has malware label ('Botnet'). Next it goes into bro folder for logs such a
 ssl.log, where are all flows for our usage. It evaluates and computes current features.
 
 Last step is creating plot data file. This file is located in 'PlotData' directory.
-2. python  Main_multi.py  name_of_created_plot_data
+
+######2. python  Main_multi.py  name_of_created_plot_data
 It is same like above, but evaluating is done for each 'single data sets'.
 So the resulting plot data file contains data from all 'single data sets'.
 
@@ -98,5 +99,5 @@ This command should show you chart contains data from dataset(s) relating to 'St
 For this viewing charts is used matplotlib library : http://matplotlib.org/
 
 ### TODO
-1. Try next a new features
-2. Complete datasets (There is no normal flows) 
+######1. Try next a new features
+######2. Complete datasets (There is no normal flows) 
