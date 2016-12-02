@@ -38,29 +38,40 @@ def read_plot_data_file(name_of_file):
 
 def create_plot():
     N = len(names_of_states)
-    # menMeans = (20, 35, 30, 35, 27)
-    # womenMeans = (25, 32, 34, 20, 25)
-    # menStd = (2, 3, 4, 1, 2)
-    # womenStd = (3, 5, 2, 3, 3)
-    ind = np.arange(N)    # the x locations for the groups
-    width = 0.35       # the width of the bars: can also be len(x) sequence
 
-    # p1 = plt.bar(ind, menMeans, width, color='r', yerr=menStd)
-    # p2 = plt.bar(ind, womenMeans, width, color='y',
-    #              bottom=menMeans, yerr=womenStd)
+    ind = np.arange(N)  # the x locations for the groups
+    width = 0.35       # the width of the bars
 
-    p1 = plt.bar(ind, malware_states, width, color='r')
-    p2 = plt.bar(ind, normal_states, width, color='y',
-                 bottom=malware_states)
+    fig,  ax = plt.subplots()
+    rects1 = ax.bar(ind, malware_states, width, color='r')
+    rects2 = ax.bar(ind + width, normal_states, width, color='y')
 
-    plt.ylabel('Number of state')
-    plt.title('Number of each type state.')
-    plt.xticks(ind + width/2., names_of_states)
-    # plt.yticks(np.arange(0, 81, 10))
-    plt.legend((p1[0], p2[0]), ('Malware', 'Normal'))
+    # add some text for labels, title and axes ticks
+    ax.set_ylabel('Number of states')
+    ax.set_title('Numbers of connection states')
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(names_of_states)
+    # For viewing the chart.
+    # ax.axis([0,5, 0, 40])
+    ax.legend((rects1[0], rects2[0]), ('Malware', 'Normal'))
+
+    def auto_label(rects):
+        # attach some text labels
+        for rect in rects:
+            height = rect.get_height()
+            ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+                    '%d' % int(height),
+                    ha='center', va='bottom')
+
+    auto_label(rects1)
+    auto_label(rects2)
+
+    # Just for maximizing window.
+    # If you get errors just because of it, delete it.
+    mng = plt.get_current_fig_manager()
+    mng.window.state('zoomed')
 
     plt.show()
-
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
