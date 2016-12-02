@@ -69,7 +69,6 @@ First of fall you should set configure file. There is two values:
 2. path_to_multi_dataset - It is path to your multi data set. 
 
 There are 2 options: 'Main_single.py' and 'Main_multi.py'.
-
 1. python  Main_single.py  name_of_created_plot_data.txt
 First it takes your argument, which is name of the result. If there is no 
 argument, the name of the result data file will be default 'new_plot_data.txt'.
@@ -80,7 +79,6 @@ which has malware label ('Botnet'). Next it goes into bro folder for logs such a
 ssl.log, where are all flows for our usage. It evaluates and computes current features.
 
 Last step is creating plot data file. This file is located in 'PlotData' directory.
-
 2. python  Main_multi.py  name_of_created_plot_data
 It is same like above, but evaluating is done for each 'single data sets'.
 So the resulting plot data file contains data from all 'single data sets'.
