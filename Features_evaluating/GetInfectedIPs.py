@@ -3,10 +3,11 @@ This file goes to binetflow file, where you can find labels for each flow. It gi
 """
 import sys
 import glob
+from PrintManager import __PrintManager__
 
 
 def get_infected_ips(path_to_folder):
-    print "<< DetInfectedIPs.py: Getting infected IPs from binetflow."
+    __PrintManager__.getinfectedips_getting()
     all_path_to_binetflow = find_name_of_binetflow(path_to_folder)
     (infected_ips_list, infected_ips_dict) = process_binetflow(all_path_to_binetflow)
     return infected_ips_list, infected_ips_dict
@@ -42,8 +43,7 @@ def process_binetflow(all_path_to_binetflow):
                         infected_ips_list.append(index)
         f.close()
     except TypeError:
-        print "Error: In current folder there is no *.binetflow or there are more binetflows.\n" \
-              "Check your path to binetflow and check if there is just one binetflow file in that folder."
+        __PrintManager__.getinfectedips_error1()
 
     return infected_ips_list, infected_ips
 
@@ -61,4 +61,4 @@ if __name__ == "__main__":
         print dict_ips[0]
 
     else:
-        print "Error: There has to be a path to folder as argument, where a binetflow file is."
+        __PrintManager__.getinfectedips_error2()
