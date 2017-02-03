@@ -39,19 +39,8 @@ if __name__ == "__main__":
     for name_single_dir in single_data_sets:
         path_to_single = path + "\\" + name_single_dir
         __PrintManager__.header_of_single_dataset(path_to_single)
-
-        # 1. Get infected IpAddress from labeled binetflow
-        # Infected_ips has two components:
-        # a. infected_ips[0] = infected_ips_list is array of infected ipAddresses
-        # b. infected_ips[1] = infected_ips is dictionary,where index is ipAdrress and value is number of infected ips
-        infected_ips = GetInfectedIPs.get_infected_ips(path_to_single)
-
-        # Add infected IPS.
-        process_logs.set_infected_ips(infected_ips[0])
-
         # Process.
         process_logs.evaluate_features(path_to_single)
-
         __PrintManager__.succ_finished_single_data()
 
     # Check tuples if each of them has 0 malware or 0 normal.

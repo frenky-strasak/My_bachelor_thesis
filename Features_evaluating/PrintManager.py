@@ -4,6 +4,7 @@ This class just print texts.
 
 from time import time
 
+
 class PrintManager:
     def __init__(self):
         self.index_of_folder = 1
@@ -40,7 +41,7 @@ class PrintManager:
     def welcome_main_multi(self):
         print "\n" \
           "<<< Welcome to Features evaluating project !!!\n" +\
-          "<<< You run Main_single.py which extracts data from single dataset.\n" \
+          "<<< You run Main_multi.py which extracts data from multi dataset.\n" \
           "<<< For more info see README.md or https://github.com/frenky-strasak/My_bachelor_thesis\n"
 
     def header_main_multi(self, path, size_of_len, name_of_file):
@@ -75,20 +76,40 @@ class PrintManager:
     def processLog_evaluating(self):
         print self.space_1 + "<< ProcessLog.py: Evaluating of conn file..."
 
+    def processLog_evaluating2(self, malware, normal, background_and_no_label, number_of_tuples, normal_tuples, malware_tuples, number_of_lines, number_adding_ssl, number_of_adding_x509):
+        print self.space_2 + "<<It was read:"
+        print self.space_2 + "<< ProcessLog.py: Number of lines:", number_of_lines
+        print self.space_2 + "<< ProcessLog.py: Flows together:", background_and_no_label + malware + normal
+        print self.space_2 + "<< ProcessLog.py: Malwares flows:", malware
+        print self.space_2 + "<< ProcessLog.py: Normal flows:", normal
+        print self.space_2 + "<< ProcessLog.py: Background flows:", background_and_no_label
+        print self.space_2 + "<< ProcessLog.py: Number of 4-tuples:", number_of_tuples
+        print self.space_2 + "<< ProcessLog.py: Normal 4-tuples:", normal_tuples
+        print self.space_2 + "<< ProcessLog.py: Malware 4-tuples:", malware_tuples
+        print self.space_2 + "<< ProcessLog.py: Number of added ssl logs:", number_adding_ssl
+        print self.space_2 + "<< ProcessLog.py: Number of added x509 logs:", number_of_adding_x509
+
     def processLog_evaluate_ssl(self):
         print self.space_1 + "<< ProcessLogs.py: Evaluating of ssl file..."
 
     def processLog_no_ssl_logs(self):
         print self.space_2 +"<< ProcessLogs.py: This data set does not have ssl logs."
 
-    def processLog_number_of_addes_ssl(self, number_adding_ssl):
-        print self.space_2 + "<< ProcessLogs.py: Pocet pridanych ssl logu: ", number_adding_ssl
+    def processLog_number_of_addes_ssl(self, count_lines):
+        print self.space_2 + "<< ProcessLogs.py: Pocet radku v ssl.log: ", count_lines
+
+    def processLog_number_of_addes_x509(self, count_lines):
+        print self.space_2 + "<< ProcessLogs.py: Pocet radku v x509.log: ", count_lines
 
     def processLog_check_tuples(self):
         print self.space_1 + "<< ProcessLogs.py: Checking connections..."
 
     def processLog_result_1_of_check(self):
         print self.space_2 + "<< ProcessLog.py: Connections are ok. Each connection has 0 malwares or 0 normal."
+
+    def processLog_result_number_of_flows(self, normal, malware):
+        print self.space_2 + "<< ProcessLog.py: Total numbers of used flows is: malware:", malware, "normal:", normal
+        print self.space_2 + "<< ProcessLog.py: Total numbers of used flows in our entire dataset: malware: 338468, normal: 343113"
 
     def processLog_result_2_of_check(self):
         print self.space_2 + "<< ProcessLog.py: CAUTION: There are some connection having malware and normal flows !!!"

@@ -21,11 +21,13 @@ def find_name_of_binetflow(path_to_folder):
     return binetflow_files[0]
 
 
-def process_binetflow(all_path_to_binetflow):
+def process_binetflow(entire_path_to_binetflow):
     infected_ips = dict()
     infected_ips_list = []
+    normal_ips = dict()
+    normal_ips_list = []
     try:
-        with open(all_path_to_binetflow) as f:
+        with open(entire_path_to_binetflow) as f:
             for line in f:
                 if 'StartTime' in line:
                     continue
@@ -41,6 +43,12 @@ def process_binetflow(all_path_to_binetflow):
                     else:
                         infected_ips[index] = 1
                         infected_ips_list.append(index)
+                elif 'Normal' in label:
+                    if index in normal_ips.keys():
+                        normal_ips[index] += 1
+                    else:
+                        normal_ips[index] = 1
+                        normal_ips_list.append(index)
         f.close()
     except TypeError:
         __PrintManager__.getinfectedips_error1()

@@ -6,7 +6,6 @@ bro folder, pcap file and binetflow file.
 
 import sys
 import ConfigManager
-import GetInfectedIPs
 from ProcessLogs import ProcessLogs
 from PrintManager import __PrintManager__
 
@@ -29,16 +28,8 @@ if __name__ == "__main__":
 
     __PrintManager__.header_main_single(path, name_of_result)
 
-    # 1. Get infected IpAddress from labeled binetflow
-    # Infected_ips has two components:
-    # a. infected_ips[0] = infected_ips_list is array of infected ipAddresses
-    # b. infected_ips[1] = infected_ips is dictionary,where index is ipAdrress and value is number of infected ipAddress
-    infected_ips = GetInfectedIPs.get_infected_ips(path)
-
-    # 2. Create 4-tuples, evaluate features and labeled them.
+    # Create 4-tuples, evaluate features and labeled them.
     process_logs = ProcessLogs(name_of_result)
-    # Add infected IPS.
-    process_logs.set_infected_ips(infected_ips[0])
     # Process.
     process_logs.evaluate_features(path)
 

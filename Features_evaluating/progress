@@ -118,3 +118,69 @@ Tasks:
 
 
 Q: Should I use not working single datasets for my datasets?
+
+7.12
+----------------------------------------------
+Asking Sebas:
+describe processing of feature
+normal captures - problem of argus features
+more malware captures
+
+20.12.
+------------------------------------------------
+pypy
+
+-copy binetflow files to dataset ! ok
+-run program for a night for some features (y) !
+
+-ask sebas what type of normal the norma is.. just hey router or go to google etc...
+- what is C&C
+- different sizes in binetflows file
+
+
+30.12 - 2.1
+-------------------------------------------------
+---------- LABEL CONN.LOG -----------------------
+Challenges:
+    - label con.log from binetfflow
+
+To Sebas:
+    - not existing tuples
+        - for example in experiment7: 83.65.26.253	3	147.32.84.94	1	icmp
+        - ipv6 in experiment7: 2002:9320:54b5::9320:54b5 62401 2001:718:2:1611:0:1:0:90 53 udp
+    - Flows from experiment 8 have more kinds of labels
+        - flow: "2011/08/16 22:37:04.645945,0.000535,tcp,147.32.84.165,1048,  <?>,195.113.232.98,80,FA_R,0,0,2,120,60,flow=Background"
+        - line 1577190
+        - I change to From-Botnet
+    - Flows from experiment 9 have more kinds of labels
+        - flow "2011/08/17 17:07:31.095954,0.000000,tcp,147.32.84.209,3942,   ?>,74.117.116.90,80,RA_,0,,1,60,60,flow=Background"
+        - flow 2011/08/17 17:09:19.418899,0.000000,tcp,147.32.84.207,2619,   ?>,74.117.116.71,80,RA_,0,,1,60,60,flow=Background
+    - To-Normal vs From-Normal... To-botnet is not there.
+    - SrcIP -> DstIP is same like DstIP -> SrcIP
+    - more cerificate in one ssl log?
+    - is one ssl log one ssl handshake?
+    - Name of thesis
+
+Result:
+    - I checked all binet file labels if they are ok. It means if each 5-tuple has same label (normal, botnet, background)
+        Result: Almost all ones are correct expect experiment8 and experiment9. More "To Sebas"...
+    - I wanted label conn.log file from binetflow file by 5-tuple, but in conn.log file, there are some 5-tuple which are not in
+      binetflow file. So instead of 5-tuples a use just "SrcIP,DstIP" and "DstIP,SrcIP" as a key for labeling. Despite the fact in conn.log
+      there are ipv6 which i can not label.
+
+3.1 - 5.1
+-------------------------------------------------------------------
+---------------- AFTER SUCCESSFULLY PSI EXAM ----------------------
+-------------------------------------------------------------------
+
+To me
+Histogram to one number
+jitter - k rozmělnení bodů v grafu (když máš 10 poitnů na jednech souřadnicích, ono ti to je trochu tak posune.)
+
+What to do:
+Ty ted mas conncections 4-tuples pro všechny flowy. Ale mám mít jen takový 4-tuply, který jsou ssl.
+Pokud máš nějakej flow, kterej není ssl, ale patří do 4-tuplu, kterej je ssl. tak don woly, je možný že bud to je jen tcp flow,
+nebo SF (SYN, FIN). Ale měl bys mít 4-tuply zkládající se jen z ssl.
+Proto asi bude nejlepší, když půjdeš nejdřív do ssl filu, tak vytvoříš 4-tuply a pak jen do conn a bude to tam k nim přidávat.
+Dále jinak makej na featurách, tam kde nějakej list of něčeho, tak udělej z toho histogram a pak nějak jedno číslo.
+Jinak se uvidíme až potom co dáš zkoušku more (y) doufám že ji dáš :D

@@ -21,23 +21,35 @@ class EvaluateData(object):
         __PrintManager__.evaluate_creating_plot()
 
         """
-        Write here which data function you want to use.
+        Write here, which data function you want to use.
         """
         # self.create_plot_data_file_1()
-        self.create_plot_data_file_2()
+        # self.create_plot_data_file_2()
+        # self.create_plot_data_file_3()
+        self.create_plot_data_file_4()
+        self.create_plot_data_file_5()
+        self.create_plot_data_file_6()
+        self.create_plot_data_file_7()
 
         __PrintManager__.evaluate_creating_succ()
-
     """
-    create_plot_data_file_1: flows x ssl
+    -----------------------------------------------------------------------------------------------------------------------
+                                ------ 2D plot -----
+    -----------------------------------------------------------------------------------------------------------------------
+    """
+    """
+    flows-ssl_log.txt: flows x ssl
     - tuple_index
     - label
     - x = number of flows
     - y = number of ssl logs
     """
     def create_plot_data_file_1(self):
-        with open("PlotData\\plot_data_1.txt", 'w') as f:
+        with open("PlotData\\flows-ssl_log.txt", 'w') as f:
             f.write(self.header)
+            f.write("# title: Flows x ssl log\n")
+            f.write("# x axis: x = Number of flows\n")
+            f.write("# y axis: y = Number of ssl logs\n")
             f.write("# [srcIpAddress, dstIpAddress, dstPort, Protocol]<<<label<<<x<<<y \n")
             for key in self.connection_4_tuples.keys():
                 label = self.connection_4_tuples[key].get_label_of_connection()
@@ -46,7 +58,56 @@ class EvaluateData(object):
                 f.write(str(key) + "<<<" + label + "<<<" + str(x) + "<<<" + str(y) + "\n")
         f.close()
 
+
     """
+    flows-flow_sizes.txt: flows x flow sizes
+    - tuple_index
+    - label
+    - x = number of flows in connection
+    - y = sizes of flows in connection
+    """
+    def create_plot_data_file_3(self):
+        with open("PlotData\\flows-flow_sizes.txt", 'w') as f:
+            f.write(self.header)
+            f.write("# title: Flows x flow sizes\n")
+            f.write("# x axis: x = Number of flows\n")
+            f.write("# y axis: y = Sizes of flows\n")
+            f.write("# [srcIpAddress, dstIpAddress, dstPort, Protocol]<<<label<<<x<<<y \n")
+            for key in self.connection_4_tuples.keys():
+                label = self.connection_4_tuples[key].get_label_of_connection()
+                x = self.connection_4_tuples[key].get_number_of_flows()
+                y = self.connection_4_tuples[key].get_total_size_of_flows()
+                f.write(str(key) + "<<<" + label + "<<<" + str(x) + "<<<" + str(y) + "\n")
+        f.close()
+
+    """
+    cert_flows.txt: number_of_ssl x number_of_different_cert
+    - tuple_index
+    - label
+    - x = number of ssl in connection
+    - y = number of different certificates in connection
+    """
+    def create_plot_data_file_6(self):
+        with open("PlotData\\cert_flows.txt", 'w') as f:
+            f.write(self.header)
+            f.write("# title: number_of_ssl x number_of_different_cert\n")
+            f.write("# x axis: x = number of ssl in connection\n")
+            f.write("# y axis: y = number of different certificates in connection\n")
+            f.write("# [srcIpAddress, dstIpAddress, dstPort, Protocol]<<<label<<<x<<<y \n")
+            for key in self.connection_4_tuples.keys():
+                label = self.connection_4_tuples[key].get_label_of_connection()
+                x = self.connection_4_tuples[key].get_number_of_ssl_logs()
+                y = len(self.connection_4_tuples[key].get_certificate_serial_dict())
+                f.write(str(key) + "<<<" + label + "<<<" + str(x) + "<<<" + str(y) + "\n")
+        f.close()
+
+    """
+    -------------------------------------------------------------------------------------------------------------------
+                                ----- BarPlot -------
+    -------------------------------------------------------------------------------------------------------------------
+    """
+    """
+    This function create compatible data for ShowFigureBar2D.py
     create_plot_data_file_2: states_of_connection
     Normal states, malware states and their total numbers.
     states: S0, S1, SF, REJ, S2, S3, RSTO, RSTR, RSTOS0, RSTRH, SH, SHR, OTH,
@@ -58,17 +119,81 @@ class EvaluateData(object):
             for state in self.connection_4_tuples[key].get_states_dict().keys():
                 if self.connection_4_tuples[key].is_malware():
                     malware_number_of_states[state] += self.connection_4_tuples[key].get_states_dict()[state]
-
                 else:
                     normal_number_of_states[state] += self.connection_4_tuples[key].get_states_dict()[state]
+        self.write_data_to_bar_file(normal_number_of_states, malware_number_of_states, self.name_of_result)
 
-        with open("PlotData\\" + self.name_of_result, 'w') as f:
+    def create_plot_data_file_4(self):
+        # ------------- certificate type -------------------
+        cert_key_type_normal = dict()
+        cert_key_type_malware = dict()
+
+        for key in self.connection_4_tuples.keys():
+            for type in self.connection_4_tuples[key].get_certificate_key_type_dict().keys():
+                if self.connection_4_tuples[key].is_malware():
+                    try:
+                        cert_key_type_malware[type] += self.connection_4_tuples[key].get_certificate_key_type_dict()[type]
+                    except:
+                        cert_key_type_malware[type] = self.connection_4_tuples[key].get_certificate_key_type_dict()[type]
+                else:
+                    try:
+                        cert_key_type_normal[type] += self.connection_4_tuples[key].get_certificate_key_type_dict()[type]
+                    except:
+                        cert_key_type_normal[type] = self.connection_4_tuples[key].get_certificate_key_type_dict()[type]
+
+        self.write_data_to_bar_file(cert_key_type_normal, cert_key_type_malware, "cert_type.txt")
+
+    def create_plot_data_file_5(self):
+        # ------------- certificate length -------------------
+        cert_key_length_normal = dict()
+        cert_key_length_malware = dict()
+
+        for key in self.connection_4_tuples.keys():
+            for type_length in self.connection_4_tuples[key].get_certificate_key_length_dict().keys():
+                if self.connection_4_tuples[key].is_malware():
+                    try:
+                        cert_key_length_malware[type_length] += self.connection_4_tuples[key].get_certificate_key_length_dict()[type_length]
+                    except:
+                        cert_key_length_malware[type_length] = self.connection_4_tuples[key].get_certificate_key_length_dict()[type_length]
+                else:
+                    try:
+                        cert_key_length_normal[type_length] += self.connection_4_tuples[key].get_certificate_key_length_dict()[type_length]
+                    except:
+                        cert_key_length_normal[type_length] = self.connection_4_tuples[key].get_certificate_key_length_dict()[type_length]
+
+        self.write_data_to_bar_file(cert_key_length_normal, cert_key_length_malware, "cert_length.txt")
+
+    def create_plot_data_file_7(self):
+        # ------------- certificate length -------------------
+        ssl_version_normal = dict()
+        ssl_version_malware = dict()
+
+        for key in self.connection_4_tuples.keys():
+            for type_length in self.connection_4_tuples[key].get_version_of_ssl_dict().keys():
+                if self.connection_4_tuples[key].is_malware():
+                    try:
+                        ssl_version_malware[type_length] += self.connection_4_tuples[key].get_version_of_ssl_dict()[type_length]
+                    except:
+                        ssl_version_malware[type_length] = self.connection_4_tuples[key].get_version_of_ssl_dict()[type_length]
+                else:
+                    try:
+                        ssl_version_normal[type_length] += self.connection_4_tuples[key].get_version_of_ssl_dict()[type_length]
+                    except:
+                        ssl_version_normal[type_length] = self.connection_4_tuples[key].get_version_of_ssl_dict()[type_length]
+
+        self.write_data_to_bar_file(ssl_version_normal, ssl_version_malware, "ssl_version.txt")
+
+    def write_data_to_bar_file(self, normal_dict, malware_dict, name_of_file):
+        malware = 0
+        normal = 0
+        with open("PlotData\\" + name_of_file, 'w') as f:
             f.write(self.header)
             f.write("# MALWARE:\n")
-            for state in malware_number_of_states.keys():
-                f.write(str(state) + ": " + str(malware_number_of_states[state]) + "\n")
+            for state in malware_dict.keys():
+                f.write(str(state) + ": " + str(malware_dict[state]) + "\n")
+                malware += malware_dict[state]
             f.write("# NORMAL:\n")
-            for state in normal_number_of_states.keys():
-                f.write(str(state) + ": " + str(normal_number_of_states[state]) + "\n")
+            for state in normal_dict.keys():
+                f.write(str(state) + ": " + str(normal_dict[state]) + "\n")
+                normal += normal_dict[state]
         f.close()
-

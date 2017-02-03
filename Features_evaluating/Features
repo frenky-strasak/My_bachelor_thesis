@@ -10,36 +10,6 @@ Connection features:
     7. List of advertised extension
 
 
-Flow features:
-    1. Duration of a flow
-    2. Size of a flow
-    3. Periodicity of flows
-    4. Differences of sizes of flows
-    5. State of connection (S_, SA_)
-    6. Differences of sizes of ssl logs
-    7. Size of public key
-    8. Cipher
-    9. Version of ssl
-   10. Certificate
-   11. One certificate for more domains
-   12. A flow has port 443 but there is no such ssl log
-
-
-- Je důležitý se zaměřit na ssl, ptotože klasický featury už má sebas zmáklý (SIZE, DURATION a PERIODICITY)
-
-Connection features:
-    1. Number of ssl logs
-    2. Total size of ssl logs
-    3. Number of ssl handshakes in one connection
-    4. List of offered ciphersuites
-    5. List of advertised extension
-    6. State of connection (S_, SA_)
-    7. Size of public key
-    8. Version of ssl
-    9. One certificate for more domains
-   10. A flow has port 443 but there is no such ssl log
-
-
 Conn.log file intersting feature:
 1. service: An identification of an application protocol being sent over the connection
 2. conn_state: S0, S1, ...
@@ -54,8 +24,8 @@ Conn.log file intersting feature:
 
 
 SSL.log file intersting features:
-1. version: SSL/TLS version that the server chose.
-2. cipher: SSL/TLS cipher suite that the server chose.
+1. version: SSL/TLS version that the server choose.
+2. cipher: SSL/TLS cipher suite that the server choose.
 3. curve: Elliptic curve the server chose when using ECDH/ECDHE. (it is almost nowhere!!)
 4. server_name: Value of the Server Name Indicator SSL/TLS extension. It indicates the server name that the client was requesting.
 5. resumed: Flag to indicate if the session was resumed reusing the key material exchanged in an earlier connection.
@@ -66,3 +36,55 @@ SSL.log file intersting features:
 10. issuer: Subject of the signer of the X.509 certificate offered by the server.
 
 X.509. log is about certificate:
+
+
+--------------------------------------------------------------------------
+Flow features:
+    1. Duration of a flow
+    2. Size of a flow
+    3. Periodicity of flows
+    4. Differences of sizes of flows
+    5. State of connection (S_, SA_)
+   // 6. Differences of sizes of ssl logs
+    7. Size of public key
+    8. Cipher
+    9. Version of ssl
+   10. Certificate valid from date
+   10-1. Certificate valid to date
+   10-2 Certificate validation length
+   10-4. Validity of the certificate during capture/analysis. (True or False)
+   10-5 Distance between the capture date and valid from date.
+   10-6 Distance between the capture date and valid to date.
+   10-7 Some relationship between the distance from capture date to valid from date???? differentiate the microsoft case from malware
+   11. The flow has port 443 but there is no such ssl log
+
+
+Connection features:
+ok |1. a] x Number of ssl logs
+       b] Number of flows
+ok |2. a]x  Total payload size of ssl logs - the size is not there.
+       b] Total payload size of flows
+? ! 3.a  number of not ssl flows in connections, becouse you first go thru ssl log !!! -
+    3.b  number of ssl flows in connection,
+    3.c  ratio = (3.a / 3.b)
+        --- (Number of ssl handshakes in one connection??? - probably it is same as number of ssl log in connection
+    4. List of offered ciphersuites
+    5. List of advertised extension
+ok |6. Histogram of the state of connections (S_, SA_) - do it again with new access to ssl.log
+ok |7. Size of public keys
+ok |8. Versions of ssl
+ok !. Amount of different certificates in the conn.
+    . Does the certificate change because of validity date? or other things?
+    9. One certificate for more domains
+   10. A flow has port 443 but there is no such ssl log
+
+------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------
+Evolution of project:
+ok ! 1. To have prepared data for extracting features.
+            a. checking if data are ok (labels are same, ...)
+            b. label bro file from binetflow file.
+none ! 2. Extract and evaluate features and select just best ones.
+none ! 3. Select some machine learning algorithm.
+none ! 4. Write results and thesis.

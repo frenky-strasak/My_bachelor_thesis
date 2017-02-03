@@ -25,14 +25,18 @@ def read_plot_data_file(name_of_file):
                 split = line.split(': ')
                 if reading_malware:
                     names_of_states.append(split[0])
-                    malware_states.append(split[1])
+                    malware_states.append(split[1].rstrip())
                 else:
                     if split[0] != names_of_states[index_normal]:
                         print "Error: Sequence of state name is not same for malware and normal!"
                         return False
-                    normal_states.append(split[1])
+                    normal_states.append(split[1].rstrip())
                     index_normal += 1
 
+    # print "malware states:"
+    # print malware_states
+    # print "normal states:"
+    # print normal_states
     f.close()
 
 
@@ -42,18 +46,19 @@ def create_plot():
     ind = np.arange(N)  # the x locations for the groups
     width = 0.35       # the width of the bars
 
-    fig,  ax = plt.subplots()
-    rects1 = ax.bar(ind, malware_states, width, color='r')
-    rects2 = ax.bar(ind + width, normal_states, width, color='y')
+    fig, ax = plt.subplots()
+    rects1_malware = ax.bar(ind, malware_states, width, color='r')
+    rects2_normal = ax.bar(ind + width, normal_states, width, color='y')
 
     # add some text for labels, title and axes ticks
     ax.set_ylabel('Number of states')
     ax.set_title('Numbers of connection states')
     ax.set_xticks(ind + width)
     ax.set_xticklabels(names_of_states)
+
     # For viewing the chart.
     # ax.axis([0,5, 0, 40])
-    ax.legend((rects1[0], rects2[0]), ('Malware', 'Normal'))
+    ax.legend((rects1_malware[0], rects2_normal[0]), ('Malware', 'Normal'))
 
     def auto_label(rects):
         # attach some text labels
@@ -63,8 +68,8 @@ def create_plot():
                     '%d' % int(height),
                     ha='center', va='bottom')
 
-    auto_label(rects1)
-    auto_label(rects2)
+    auto_label(rects1_malware)
+    auto_label(rects2_normal)
 
     # Just for maximizing window.
     # If you get errors just because of it, delete it.
@@ -73,11 +78,27 @@ def create_plot():
 
     plt.show()
 
+
+def count_showed_data():
+    malware = 0
+    normal = 0
+    for i in range(len(malware_states)):
+        malware += int(malware_states[i])
+    for i in range(len(normal_states)):
+        normal += int(normal_states[i])
+
+    return normal, malware
+
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         name_of_datafile = sys.argv[1]
         read_plot_data_file(name_of_datafile)
+
+        normal, malware = count_showed_data()
+        print "normal and malware:", normal, malware
+
         create_plot()
+
     else:
         print "Error: There must be exactly one argument as name of the data file."
 
