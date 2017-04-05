@@ -164,6 +164,7 @@ class EvaluateData(object):
 
         self.write_data_to_bar_file(cert_key_length_normal, cert_key_length_malware, "cert_length.txt")
 
+
     def create_plot_data_file_7(self):
         # ------------- certificate length -------------------
         ssl_version_normal = dict()
