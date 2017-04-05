@@ -3,7 +3,7 @@ This file goes to binetflow file, where you can find labels for each flow. It gi
 """
 import sys
 import glob
-from PrintManager import __PrintManager__
+from Features_evaluating.PrintManager import __PrintManager__
 
 
 def get_infected_ips(path_to_folder):

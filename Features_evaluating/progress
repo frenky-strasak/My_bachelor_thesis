@@ -184,3 +184,89 @@ nebo SF (SYN, FIN). Ale měl bys mít 4-tuply zkládající se jen z ssl.
 Proto asi bude nejlepší, když půjdeš nejdřív do ssl filu, tak vytvoříš 4-tuply a pak jen do conn a bude to tam k nim přidávat.
 Dále jinak makej na featurách, tam kde nějakej list of něčeho, tak udělej z toho histogram a pak nějak jedno číslo.
 Jinak se uvidíme až potom co dáš zkoušku more (y) doufám že ji dáš :D
+
+
+3.2. 2017
+-----------------------------------------------------------------
+- V nasem datasete kazdej ssl log vyuziva tcp. Viz Test.py
+    - Tudiz koukni jestli to je tak vzdy
+- Takze pravdepodobvne budees delat 3-tuples [SrcAddress, DstAddress, DstPort]
+    - Zacni nacitat x509, ktery pak potrebuje ssl. A nakonec con.file.
+
+
+- koukni do x509 jak vyresit ze maj vice uids v jednom filu
+
+
+
+------------------------------------------------------
+8.2 2017
+
+     1. Rewrite the labels
+        From-Botnet = Botnet
+        From-Normal = Normal
+        or
+        (ask sebas for malware IPs a normal IPs and then just go thru conn.log and see SrcIP address and label the conn line)
+     2. [Feature 10.] Look at more ports not just 443 but smtps (9443 or 963 or 2525).
+ok | 3. [x509 log] First key is certificate!!! The second means, that the first one is signed to second one. Etc.
+     4. Think about Features which are not number (connection feature and flow feature)
+     5. Certificates number are wierd.
+     6. Look if label are bad! Becaouse different between From-X and hust X is very small.
+
+------------------------------------------------------
+23.2 2017
+in experiment 3, where 147.32.84.165 is infected ip:
+2011/08/14 22:10:29.077570,3550.123291,tcp,147.32.84.165,1027,  <?>,38.229.70.20,6667,PA_PA,0,0,354,32846,20360,flow=Background
+2011/08/15 09:23:04.505853,2064.563965,tcp,147.32.84.165,1027,  <?>,38.229.70.20,6667,PA_FPA,0,0,51,3921,1146,flow=Background
+
+------------------------ Bad access to Sebas method ----------------
+histogram to number:
+lets imagine public key length:
+
+128  | 2                0.02                                       0.02 - 0
+256  | 8                0.08                                       0.08 - 2
+512  | 10               0.1                                        0.1  - 3
+1024 | 100   normalize  1       to scale from 0 to 6               1    - 6   = 0236541
+2048 | 53               0.53    0.02 0.07 0.08 0.1 0.12 0.53 1     0.53 - 5
+4096 | 12               0.12    0    1    2    3   4    5    6     0.12 - 4
+8192 | 7                0.07                                       0.07 - 1
+
+
+128  | 15               0.1                                         0.1   - 0
+256  | 18               0.12                                        0.12  - 2
+512  | 25               0.17                                        0.17  - 3
+1024 | 150   normalize  1       to scale from 0 to 6                1     - 6   = 0236541
+2048 | 70               0.47    0.1 0.113 0.12 0.17 0.18 0.47 1     0.47  - 5
+4096 | 27               0.18    0     1     2    3   4    5   6     0.18  - 4
+8192 | 17               0.113                                       0.113 - 1
+
+
+------------------------ Good approach by Sebas method ----------------
+128  | 2                0.02     0 1 2 3 4 5 6 7 8 9
+256  | 8                0.08    |
+512  | 10               0.1     |
+1024 | 100   normalize  1       |
+2048 | 53               0.53    |
+4096 | 12               0.12    |
+8192 | 7                0.07    |
+                                --------------------
+                                0                   1
+
+Hoffman coding ?
+prime number with sum ?     n^p1 + k^p2
+cantor pairing function (or scuki pair function)
+
+
+1.3. 2017
+------------------------------------------
+ok | 1. Understand how sebas method works
+ok | 2. Create thesis doc
+ok | 3. Write which method are for labeling.  --> MakeLabel.py
+4. Find best way how to interpret histogram (sebas method, cantor method, new method, prime numbers with modulo)
+    a. create som connection where is clear that they are distinct. A look how your algorithm works.
+    b. standard deviation  = another method for histogram
+
+
+
+
+------------ Half life method --------------
+- each histogram put in more way, so put in

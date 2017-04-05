@@ -1,6 +1,7 @@
 import sys
 import time
 import datetime
+import glob
 
 def evaluate_ssl_file(path_to_dataset, x509_dict):
         number_of_adding_x509 = 0
@@ -209,63 +210,176 @@ def read_conn(path, ssl_uid_dict, x509_uids):
 
 
 
+# ---------------------------------------------------------------
+
+
+def read_ssl_file(path_to_dataset, conn_dict):
+    index = 0
+    protocol_dict = dict()
+    ssl_tuple = dict()
+    try:
+        with open(path_to_dataset + "\\bro\\ssl.log") as f:
+            for line in f:
+                if '#' in line:
+                    continue
+                index += 1
+                split = line.split('	')
+                #
+                connection_index = split[2], split[4], split[5], #split[6]
+                ssl_uid = split[1]
+
+                try:
+                    ssl_tuple[ssl_uid] += 1
+                    print "Error: In ssl log, there is more same uids."
+                except:
+                    ssl_tuple[ssl_uid] = 1
+                    try:
+                        if conn_dict[ssl_uid]:
+                            split = conn_dict[ssl_uid].split('	')
+                            try:
+                                protocol_dict[split[6]] += 1
+                            except:
+                                protocol_dict[split[6]] = 1
+                    except:
+                        print "Error: There is no conn line for this ssl line."
+
+    except:
+        print "Error: There is no file."
+
+    for key in protocol_dict.keys():
+        print key, protocol_dict[key]
+    print index
+
+
+def read_conn_file(path):
+
+    conn_tuple = dict()
+    with open(path + '\\bro\\conn_label.log') as f:
+         for line in f:
+            if '#' in line:
+                continue
+            split = line.split('	')
+            uid = split[1]
+
+            try:
+                if conn_tuple[uid]:
+                    print "Error: More same uids in conn.log. Uids:", uid
+            except:
+                conn_tuple[uid] = line
+
+    return conn_tuple
+    # for key in conn_tuple.keys():
+        # print key, conn_tuple[key]
+
+
+def load_ssl_check_443(path_to_dataset):
+    ssl_dict = dict()
+    with open(path_to_dataset + "\\bro\\ssl.log") as f:
+        for line in f:
+            if '#' in line:
+                continue
+            split = line.split('	')
+            ssl_uid = split[1]
+            try:
+                ssl_dict[ssl_uid] += 1
+                print "Error: there is more same ssl line !!!"
+            except:
+                ssl_dict[ssl_uid] = 1
+    f.close()
+    return ssl_dict
+
+def load_conn_check_443(path_to_dataset, ssl_dict):
+    normal = 0
+    botnet = 0
+    conn_tuple = dict()
+    with open(path_to_dataset + '\\bro\\conn_label.log') as f:
+         for line in f:
+            if '#' in line:
+                continue
+            split = line.split('	')
+            uid = split[1]
+            dstPort = split[5]
+            label = split[21]
+
+            if dstPort != "443":
+                continue
+            if 'Background' in label or 'No_Label' in label:
+                continue
+
+            try:
+                if ssl_dict[uid]:
+                    pass
+            except:
+                # print "Error: There is port 443, but no ssl log !!! :", uid + " label: " + split[21]
+                if 'Botnet' in label:
+                    botnet += 1
+                elif 'Normal' in label:
+                    normal += 1
+                else:
+                    print "Error in Connectio_4_tuple: Here is label which is not normal or malware (botnet). It is:", label
+    f.close()
+
+    print "Normal:", normal
+    print "Botnet", botnet
+
+
+
+"""
+-----------------------------------------------------------------------------------
+"""
+
+
+
+def get_ips_from_binet(path, src_adress, dst_adress):
+
+    print "------ Reading binetflow file -------------"
+
+    try:
+        with open(path) as f:
+            for line in f:
+                split_line = line.split(",")
+                label = split_line[14]
+                actual_src_address = split_line[3]
+                actual_dst_address = split_line[6]
+
+                if '147.32.84.165' == actual_src_address and '94.236.95.170' == actual_dst_address:
+                    print label
+
+        f.close()
+    except IOError:
+        print "hele more, spatna cesta :("
+
+
+
+def find_binetflow_file(path):
+    path_to_binet = glob.glob(path + "/*.binetflow")
+    return path_to_binet[0]
+
+
 if __name__ == '__main__':
+
+    path = sys.argv[1]
+    srcAddress = sys.argv[2]
+    dstAddress = sys.argv[3]
+
+    get_ips_from_binet(find_binetflow_file(path), srcAddress, dstAddress)
+
     # if len(sys.argv) == 2:
     #     path = sys.argv[1]
-    # else:
-    #     path = None
-    # dict_uid = evaluate_ssl_file(path)
-    # read_conn(path, dict_uid)
+    #     ssl_dict = load_ssl_check_443(path)
+    #     load_conn_check_443(path, ssl_dict)
 
-    if len(sys.argv) == 2:
-        path = sys.argv[1]
+    # if len(sys.argv) == 2:
+    #     path = sys.argv[1]
+    #     conn_dict = read_conn_file(path)
+    #     read_ssl_file(path, conn_dict)
 
-        dict_x = evaluate_x509(path)
-        ssl_dict = evaluate_ssl_file(path, dict_x)
-        read_conn(path, ssl_dict, dict_x)
 
-    # ts_epoch = 1362301382
-    # ts = datetime.datetime.fromtimestamp(ts_epoch).strftime('%Y-%m-%d %H:%M:%S')
-    # print ts
-
-    # a = 1244486607.000000
-    # b = 1084399200.000000
+    # if len(sys.argv) == 2:
+    #     path = sys.argv[1]
     #
-    # print a-b
+    #     dict_x = evaluate_x509(path)
+    #     ssl_dict = evaluate_ssl_file(path, dict_x)
+    #     read_conn(path, ssl_dict, dict_x)
 
-#
-# class Base(object):
-#     def __init__(self):
-#         self.name = None
-#         self.value = None
-#
-#     def get_name(self):
-#         return self.name
-#
-#     def smrdis(self):
-#         print "je to: ", self.name
-#
-#     def get_value(self):
-#         print self.value
-#
-#
-# class Derivate(Base):
-#     def __init__(self, n1, n2, value):
-#         super(Derivate, self).__init__()
-#         self.n1 = n1
-#         self.n2 = n2
-#         self.value = value
-#
-#     def set_name(self):
-#         self.name = "ahoj svete"
-#
-#     def get_name(self):
-#         return self.name
-#
-#
-# if __name__ == "__main__":
-#     temp = Derivate(1,2,5)
-#     temp.set_name()
-#     print temp.get_name()
-#     temp.smrdis()
-#     temp.get_value()
+

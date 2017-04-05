@@ -76,16 +76,13 @@ class PrintManager:
     def processLog_evaluating(self):
         print self.space_1 + "<< ProcessLog.py: Evaluating of conn file..."
 
-    def processLog_evaluating2(self, malware, normal, background_and_no_label, number_of_tuples, normal_tuples, malware_tuples, number_of_lines, number_adding_ssl, number_of_adding_x509):
+    # malware_flows, normal_flows, malware_tuples, normal_tuples, number_adding_ssl, number_of_adding_x509
+    def processLog_evaluating2(self,  malware_flows, normal_flows, malware_tuples, normal_tuples, number_adding_ssl, number_of_adding_x509):
         print self.space_2 + "<<It was read:"
-        print self.space_2 + "<< ProcessLog.py: Number of lines:", number_of_lines
-        print self.space_2 + "<< ProcessLog.py: Flows together:", background_and_no_label + malware + normal
-        print self.space_2 + "<< ProcessLog.py: Malwares flows:", malware
-        print self.space_2 + "<< ProcessLog.py: Normal flows:", normal
-        print self.space_2 + "<< ProcessLog.py: Background flows:", background_and_no_label
-        print self.space_2 + "<< ProcessLog.py: Number of 4-tuples:", number_of_tuples
-        print self.space_2 + "<< ProcessLog.py: Normal 4-tuples:", normal_tuples
         print self.space_2 + "<< ProcessLog.py: Malware 4-tuples:", malware_tuples
+        print self.space_2 + "<< ProcessLog.py: Normal 4-tuples:", normal_tuples
+        print self.space_2 + "<< ProcessLog.py: Malwares flows[conn]:", malware_flows
+        print self.space_2 + "<< ProcessLog.py: Normal flows[conn]:", normal_flows
         print self.space_2 + "<< ProcessLog.py: Number of added ssl logs:", number_adding_ssl
         print self.space_2 + "<< ProcessLog.py: Number of added x509 logs:", number_of_adding_x509
 
@@ -125,5 +122,11 @@ class PrintManager:
     def getinfectedips_error2(self):
         print "Error: There has to be a path to folder as argument, where a binetflow file is."
 
+    def print_header_certificates(self):
+        print "\n\n"
+        print self.space_2 + "<< Printing certificates:"
 
+    def print_header_features_printed(self):
+        print "\n\n"
+        print self.space_2 + "<< Printing features:"
 __PrintManager__ = PrintManager()

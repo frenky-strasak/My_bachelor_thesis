@@ -23,13 +23,14 @@ class EvaluateData(object):
         """
         Write here, which data function you want to use.
         """
+        self.create_dataset()
         # self.create_plot_data_file_1()
         # self.create_plot_data_file_2()
         # self.create_plot_data_file_3()
-        self.create_plot_data_file_4()
-        self.create_plot_data_file_5()
-        self.create_plot_data_file_6()
-        self.create_plot_data_file_7()
+        # self.create_plot_data_file_4()
+        # self.create_plot_data_file_5()
+        # self.create_plot_data_file_6()
+        # self.create_plot_data_file_7()
 
         __PrintManager__.evaluate_creating_succ()
     """
@@ -197,3 +198,34 @@ class EvaluateData(object):
                 f.write(str(state) + ": " + str(normal_dict[state]) + "\n")
                 normal += normal_dict[state]
         f.close()
+
+    """
+    --------------------------------------------------------------------------------------
+    """
+    def create_dataset(self):
+        useful_ssl_flows = 0
+        all_flows = 0
+        malware = 0
+        normal = 0
+        space = '	'
+        with open("PlotData\\" + "result.txt", 'w') as f:
+            for key in self.connection_4_tuples.keys():
+                f.write(str(key) + space +
+                        str(self.connection_4_tuples[key].get_number_of_flows()) + space +
+                        str(self.connection_4_tuples[key].get_number_of_ssl_logs()) + space +
+                        str(self.connection_4_tuples[key].get_amount_diff_certificates()) + space +
+                        str(self.connection_4_tuples[key].get_size_of_x509_list()) + space +
+                        self.connection_4_tuples[key].get_label_of_connection() + space +
+                        "\n")
+                useful_ssl_flows += self.connection_4_tuples[key].get_number_of_ssl_flows()
+                all_flows += self.connection_4_tuples[key].get_number_of_flows()
+
+                if self.connection_4_tuples[key].is_malware():
+                    malware += 1
+                else:
+                    normal += 1
+        f.close()
+        print "usefull_ssl_flows", useful_ssl_flows
+        print "all_flows", all_flows
+        print "malware connection", malware
+        print "normal connection", normal

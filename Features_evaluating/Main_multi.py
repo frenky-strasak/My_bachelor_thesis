@@ -5,10 +5,10 @@ at least one single datsets. Single dataset is folder where you can find: bro fo
 """
 
 import sys
+
 import ConfigManager
-import GetInfectedIPs
-from ProcessLogs import ProcessLogs
 from PrintManager import __PrintManager__
+from ProcessLogs import ProcessLogs
 
 if __name__ == "__main__":
 
@@ -46,4 +46,4 @@ if __name__ == "__main__":
     # Check tuples if each of them has 0 malware or 0 normal.
     process_logs.check_4_tuples()
     # Create plot data for current featues.
-    process_logs.create_plot_data()
+    # process_logs.create_plot_data()

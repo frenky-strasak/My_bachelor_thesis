@@ -40,10 +40,10 @@ X.509. log is about certificate:
 
 --------------------------------------------------------------------------
 Flow features:
-    1. Duration of a flow
+ok    1. Duration of a flow
     2. Size of a flow
     3. Periodicity of flows
-    4. Differences of sizes of flows
+   // 4. Differences of sizes of flows
     5. State of connection (S_, SA_)
    // 6. Differences of sizes of ssl logs
     7. Size of public key
@@ -51,36 +51,100 @@ Flow features:
     9. Version of ssl
    10. Certificate valid from date
    10-1. Certificate valid to date
-   10-2 Certificate validation length
-   10-4. Validity of the certificate during capture/analysis. (True or False)
+ok   10-2 Certificate validation length
+ok   10-4. Validity of the certificate during capture/analysis. (True or False)
    10-5 Distance between the capture date and valid from date.
    10-6 Distance between the capture date and valid to date.
-   10-7 Some relationship between the distance from capture date to valid from date???? differentiate the microsoft case from malware
+ok   10-7 Some relationship between the distance from capture date to valid from date???? differentiate the microsoft case from malware
    11. The flow has port 443 but there is no such ssl log
 
 
-Connection features:
-ok |1. a] x Number of ssl logs
-       b] Number of flows
-ok |2. a]x  Total payload size of ssl logs - the size is not there.
-       b] Total payload size of flows
-? ! 3.a  number of not ssl flows in connections, becouse you first go thru ssl log !!! -
-    3.b  number of ssl flows in connection,
-    3.c  ratio = (3.a / 3.b)
-        --- (Number of ssl handshakes in one connection??? - probably it is same as number of ssl log in connection
-    4. List of offered ciphersuites
-    5. List of advertised extension
-ok |6. Histogram of the state of connections (S_, SA_) - do it again with new access to ssl.log
-ok |7. Size of public keys
-ok |8. Versions of ssl
-ok !. Amount of different certificates in the conn.
-    . Does the certificate change because of validity date? or other things?
-    9. One certificate for more domains
-   10. A flow has port 443 but there is no such ssl log
+    Connection features:
+ok  ok |1. a]
+           b] Number of flows
+ok  ok |2. a]
+           b] Total payload size of flows
+ok  ok |3.a  number of not ssl flows in connections, because you first go thru ssl log !!! -
+        3.b  number of ssl flows in connection,
+        3.c  ratio = (3.a / 3.b)
+    x   3.d (Number of ssl handshakes in one connection??? - probably it is same as number of ssl log in connection
+ok  ok  4. [histogram] List of offered ciphersuites (SSL/TLS cipher suite that the server chose.)
+?    ?   5. List of advertised extension
+ok  ok |6.  [histogram] Histogram of the state of connections (S_, SA_)
+ok  ok |7.  [histogram] Size of public keys
+ok  ok |8.  [histogram] Versions of ssl (SSL/TLS version that the server chose.)
+ok  ok !.   [number] Amount of different certificates in the conn.
+        . Does the certificate change because of validity date? or other things?
+ok  ?    9. One certificate for more domains (The average number of domains per certificate in the connection)
+ok  ?   10. A flow has port 443(and 963...) but there is no such ssl log
 
 ------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------
+
+        Final features for connections:
+
+number          1. Number of flows
+hist            2.a Histogram of Duration of flows
+                  b StdDev of Duration of flows
+                  c Average of Duration of flows
+number          3. Total payload size of flows
+number          4. Ratio of not ssl flows and ssl flows
+hist            5.a Histogram List of offered cipher suites
+                  b StdDev of List of offered cipher suites
+                  c Average of List of offered cipher suites
+hist            6. State of connections
+hist            7. Sizes of public keys
+bool            8. Validity of the certificate during the capture
+number          9. Certificate validation length
+hist           10. Version of ssl
+number         11. Amount of different certificates
+?              12. List of advertised extension
+number         13. One certificate for more domains
+number         14. A flow has port 443(or 936), but there is no ssl log
+number         15. Certificate ratio
+
+
+
+               ----------------------         Histogram feature    ----------------------------
+
+2. Duration of flows
+        - source: conn.log, index=8
+        - value range=<0, inf>
+        - solution: standard deviation
+
+5. List of offered cipher suites
+        - source: ssl.log, index=7
+        - value range in our dataset={'TLS_RSA_WITH_3DES_EDE_CBC_SHA': 865, 'TLS_RSA_WITH_RC4_128_MD5': 17550, 'SSLv20_CK_RC4_128_WITH_MD5': 2,
+                        'TLS_DHE_RSA_WITH_AES_256_CBC_SHA': 34508, 'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA': 3, '-': 112133,
+                        'TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA': 2627, 'TLS_RSA_WITH_AES_128_CBC_SHA': 12306, 'TLS_RSA_WITH_CAMELLIA_256_CBC_SHA': 818,
+                        'SSLv20_CK_DES_192_EDE3_CBC_WITH_MD5': 10, 'TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA': 4, 'TLS_ECDHE_RSA_WITH_RC4_128_SHA': 88,
+                        'TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA': 95, 'TLS_RSA_WITH_RC4_128_SHA': 198422, 'TLS_DHE_RSA_WITH_AES_128_CBC_SHA': 409,
+                        'TLS_RSA_EXPORT_WITH_RC4_40_MD5': 3, 'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA': 1, 'TLS_RSA_WITH_AES_256_CBC_SHA': 21144,
+                        'TLS_DH_ANON_WITH_RC4_128_MD5': 23}
+        - solution:
+
+6. State of connections
+        - source: conn.log, index=11
+        - value range={S0, S1, SF, REJ, S2, S3, RSTO, RSTR, RSTOS0, RSTRH, SH, SHR, OTH}
+        - value range in our dataset: {'OTH': 11042442, 'SHR': 31993, 'RSTRH': 15623, 'RSTR': 120652, 'S3': 29098, 'S2': 6611,
+                                        'S1': 95405, 'S0': 2024555, 'RSTOS0': 43328, 'REJ': 718477, 'SH': 85462, 'RSTO': 489513, 'SF': 21601638}
+        - solution:
+
+7. Sizes of public keys
+        - source: x509.log index=11
+        - vaule range in our dataset={1024: 136378, 2048: 29608, 4096: 113, '-': 211, 512: 37}
+        - solution: standard deviation; Sebas method;
+
+10. Version of ssl
+        - source: ssl.log, index=6
+        - value range generally={SSL 1.0, SSL 2.0, SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, TLS 1.3}
+        - value range in our dataset={'TLSv10': 262961, '-': 112133, 'SSLv3': 25905, 'SSLv2': 12}
+        - solution: all as feature; Sebas Method/HL Method
+
+
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 Evolution of project:
 ok ! 1. To have prepared data for extracting features.
             a. checking if data are ok (labels are same, ...)
