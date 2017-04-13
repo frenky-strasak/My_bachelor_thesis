@@ -64,6 +64,7 @@ def extract_feature(path):
     f.close()
     return d
 
+
 if __name__ == '__main__':
     my_path = "c:/Users/frenk/Documents/Skola/Bachelor_thesis/datasets/"
 
