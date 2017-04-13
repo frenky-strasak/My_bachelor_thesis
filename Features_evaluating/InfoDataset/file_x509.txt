@@ -1,0 +1,2 @@
+servernamesm with no certificates:
+    1. cz.mbank.eu

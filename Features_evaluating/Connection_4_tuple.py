@@ -2,7 +2,7 @@
 This class stores all information for one "connection 4-tuple" object.
 Also it computes features.
 """
-
+import numpy
 
 class Connection4tuple:
 
@@ -36,6 +36,7 @@ class Connection4tuple:
         self.version_of_ssl_dict = dict()
         self.version_of_ssl_cipher_dict = dict()
         self.certificate_path = dict()
+        self.ssl_uids_list = []
         # X509 features
         self.certificate_key_type_dict = dict()
         self.certificate_key_length_dict = dict()
@@ -47,6 +48,8 @@ class Connection4tuple:
         self.number_san_domains = 0
         self.number_san_domains_index = 0
         self.cert_percent_validity = 0
+
+        self.temp_list = []
 
         # ssl_flow = this flow has ssl log in ssl file
     def add_ssl_flow(self, flow, label):
@@ -121,6 +124,7 @@ class Connection4tuple:
     def compute_ssl_features(self, ssl_log):
         self.ssl_logs_list.append(ssl_log)
         split = ssl_log.split('	')
+        self.ssl_uids_list.append(split[1])
         try:
             self.version_of_ssl_dict[split[6]] += 1
         except:
@@ -167,8 +171,13 @@ class Connection4tuple:
         if split[7] != '-' and split[6] != '-':
             try:
                 # certificate valid length
-                self.certificate_valid_length += float(split[7]) - float(split[6])
-                self.certificate_valid_length_pow += pow(float(split[7]) - float(split[6]), 2)
+                valid_length_sec = float(split[7]) - float(split[6])
+                valid_length_days_not_round = int((valid_length_sec / (3600.0 * 24.0)))
+                valid_length_days = round(valid_length_days_not_round, 2)
+                self.temp_list.append(valid_length_days)
+
+                self.certificate_valid_length += valid_length_days
+                self.certificate_valid_length_pow += pow(valid_length_days, 2)
                 self.certificate_valid_number += 1
 
                 # check if certificate was valid durig the capture
@@ -270,22 +279,23 @@ class Connection4tuple:
         return self.get_number_of_ssl_flows() + self.get_number_of_not_ssl_flows()
 
     # ---------------------------------------------------
-    # 02. ---------- Duration of flows ----------------
-    # a) Average
+    # ---------- Duration of flows ------------------
+    # 02. Average
     def get_average_of_duration(self):
         self.check_zero_dividing(self.flow_which_has_duration_number, "flow_which_has_duration_number is 0 !!!")
         return self.average_duration / float(self.flow_which_has_duration_number)
 
-    # b) Standard deviation
+    # 03. Standard deviation
     def get_standard_deviation_duration(self):
         self.check_zero_dividing(self.flow_which_has_duration_number, "flow_which_has_duration_number is 0 !!!")
 
-        EX = self.average_duration / float(self.flow_which_has_duration_number)
-        EX2 = self.average_duration_power / float(self.flow_which_has_duration_number) # E(X^2)
-        DX = EX2 - EX*EX
-        return pow(DX, 0.5)
+        # EX = self.average_duration / float(self.flow_which_has_duration_number)
+        # EX2 = self.average_duration_power / float(self.flow_which_has_duration_number) # E(X^2)
+        # DX = EX2 - EX*EX
+        # return pow(DX, 0.5)
+        return numpy.std(self.duration_list)
 
-    # c) Percent of flows which are bigger or less than standard deviation with average
+    # 04. Percent of flows which are bigger or less than standard deviation with average
     def get_percent_of_standard_deviation_duration(self):
         self.check_zero_dividing(self.flow_which_has_duration_number, "flow_which_has_duration_number is 0 !!!")
 
@@ -301,38 +311,40 @@ class Connection4tuple:
         return out_of_bounds / float(self.flow_which_has_duration_number)
 
     # -------------------------------------------------------------------
-    # 03 -------- Total payload size of flows the originator sent --------
+    # 05 -------- Total payload size of flows the originator sent --------
     def get_total_size_of_flows_orig(self):
         return self.total_size_of_flows_orig
 
     # ------------------------------------------------------------------
-    # 04 -------- Total payload size of flows the responder sent --------
+    # 06 -------- Total payload size of flows the responder sent --------
     def get_total_size_of_flows_resp(self):
         return self.total_size_of_flows_resp
 
     # ---------------------------------------------------------------------------
-    # 05 ------ Ratio of responder payload sizes and originator payload sizes ----
+    # 07 ------ Ratio of responder payload sizes and originator payload sizes ----
     def get_ratio_of_sizes(self):
-        self.check_zero_dividing(self.total_size_of_flows_orig, "Original size is 0 !!!")
-        return self.total_size_of_flows_resp / float(self.total_size_of_flows_orig)
+        # self.check_zero_dividing(self.total_size_of_flows_orig, "Original size is 0 !!!")
+        if self.total_size_of_flows_orig != 0:
+            return self.total_size_of_flows_resp / float(self.total_size_of_flows_orig)
+        return 0
 
     # --------------------------------------------------------------------
-    # 06 ------ State of connection -------------------------------------
-    # a] Percent of established connection
+    # ------ State of connection -------------------------------------
+    # 08 Percent of established connection
     def get_percent_of_established_states(self):
         establihed_states = 0
         total_value_states = 0
         for key in self.state_of_connection_dict.keys():
             total_value_states += self.state_of_connection_dict[key]
-        establihed_states += self.state_of_connection_dict['SF']
-        establihed_states += self.state_of_connection_dict['S1']
-        establihed_states += self.state_of_connection_dict['S2']
-        establihed_states += self.state_of_connection_dict['S3']
-        establihed_states += self.state_of_connection_dict['RSTO']
-        establihed_states += self.state_of_connection_dict['RSTR']
-        return (establihed_states / float(total_value_states)) * 100
+        establihed_states += self.state_of_connection_dict.get('SF', 0)
+        establihed_states += self.state_of_connection_dict.get('S1', 0)
+        establihed_states += self.state_of_connection_dict.get('S2', 0)
+        establihed_states += self.state_of_connection_dict.get('S3', 0)
+        establihed_states += self.state_of_connection_dict.get('RSTO', 0)
+        establihed_states += self.state_of_connection_dict.get('RSTR', 0)
+        return (establihed_states / float(total_value_states))
 
-    # b]
+    # 09 - return 4 items
     def get_based_states_ratio(self):
         SF_S1 = self.state_of_connection_dict['SF'] + self.state_of_connection_dict['S1']
         S0 = self.state_of_connection_dict['S0']
@@ -341,7 +353,7 @@ class Connection4tuple:
         biggest = max(SF_S1, S0, OTH, REJ) / 100.0
         return SF_S1 / float(biggest), S0 / float(biggest), OTH / float(biggest), REJ / float(biggest)
 
-    # c]
+    # 10 - return 6 items
     def get_extended_states_ratio(self):
         SF_S1 = self.state_of_connection_dict['SF'] + self.state_of_connection_dict['S1']
         S0 = self.state_of_connection_dict['S0']
@@ -352,49 +364,60 @@ class Connection4tuple:
         biggest = max(SF_S1, S0, OTH, REJ, RSTO_1, RSTO_2) / 100.0
         return SF_S1 / float(biggest), S0 / float(biggest), OTH / float(biggest), REJ / float(biggest), RSTO_1 / float(biggest), RSTO_2 / float(biggest)
 
+    # 11 inbound packets == resp_pkts (18)
+    # Number of packets that the responder sent.
+    def get_inbound_pckts(self):
+        return self.inbound_packtes
+
+    # 12 outbound packets == orig_pkts (16)
+    def get_outbound_pckts(self):
+        return self.outbound_packtes
+
+    # Periodicity
+    # 13 Average of periodicity
+    def get_periodicity_average(self):
+        per_list = self.get_periodicity_list()
+        sum = 0
+        for i in range(len(per_list)):
+            sum += per_list[i]
+        if len(per_list) != 0:
+            return sum / float(len(per_list))
+        # print "periodicity list is zero. Number of flows:", self.get_number_of_flows()
+        return 0
+
+    # 14
+    def get_periodicity_standart_deviation(self):
+        EX = self.get_periodicity_average()
+        per_list = self.get_periodicity_list()
+        if len(per_list) != 0:
+            # sum = 0
+            # for i in range(len(per_list)):
+            #     sum += pow(per_list[i], 2)
+            # EX2 = sum / float(len(per_list))
+            # DX = EX2 - EX * EX
+            # return pow(DX, 0.5)
+            numpy.std(self.get_periodicity_list())
+        return 0
+
     # -----------------------------------------------------
-    # 07 ------ Ratio of not ssl flows and ssl flows -------
+    # 15 ------ Ratio of not ssl flows and ssl flows -------
     def get_ssl_ratio(self):
         self.check_zero_dividing(len(self.ssl_flow_list), "Original size is 0 !!!")
         return len(self.not_ssl_flow_list) / len(self.ssl_flow_list)
 
-    # ------------------------------------------------
-    # 08 ------ List of offered ciphersuites --------
-
-    # --------------------------------------------
-    # 09 Public key lenghts
+    # 16 Average Public key lenghts
     def get_average_public_key(self):
         total = 0
         index = 0
         for key in self.certificate_key_length_dict.keys():
             total += self.certificate_key_length_dict[key] * int(key)
             index += 1
-        return total / float(index)
-
-    # ---------------------------------------------
-    # 10 Validity of the certificate during the capture
-    def is_valid_certificate_during_capture(self):
-        return self.not_valid_certificate_number
-
-    # ----------------------------------------------
-    # 11 Certificate validation length
-    # a] Average of certificate length
-    def get_average_of_certificate_length(self):
-        self.check_zero_dividing(self.certificate_valid_number, "certificate_valid_number is 0 !!!")
-
-        return self.certificate_valid_length / float(self.certificate_valid_number)
-
-    # b]
-    def get_standart_deviation_cert_length(self):
-        self.check_zero_dividing(self.certificate_valid_number, "certificate_valid_number is 0 !!!")
-
-        EX = self.certificate_valid_length / float(self.certificate_valid_number)
-        EX2 = self.certificate_valid_length_pow / float(self.certificate_valid_number)
-        DX = EX2 - EX*EX
-        return pow(DX, 0.5)
+        if index != 0:
+            return total / float(index)
+        return 0
 
     # ------------------------------------------------------
-    # 12  Version of ssl ratio
+    # 17  Version of ssl ratio
     def get_tls_version_ratio(self):
         tls = 0
         ssl = 0
@@ -403,43 +426,62 @@ class Connection4tuple:
             if 'TLS' in key:
                 tls += self.version_of_ssl_dict[key]
             elif 'SSL' in key:
-               ssl += self.version_of_ssl_dict[key]
+                ssl += self.version_of_ssl_dict[key]
             total += self.version_of_ssl_dict[key]
 
-        return tls / float(total) * 100
+        return tls / float(total)
 
-    # -------------------------------------------------------
-    # 13 Amount of different certificates
+    # ----------------------------------------------
+    # Certificate validation length
+    # 18 Average of certificate length
+    # certificate_valid_length = sum of certificate valid length
+    # certificate_valid_number = number of certificate*
+    def get_average_of_certificate_length(self):
+        # self.check_zero_dividing(self.certificate_valid_number, "certificate_valid_number is 0 !!!")
+        if self.certificate_valid_number != 0:
+            if numpy.mean(self.temp_list) != self.certificate_valid_length / float(self.certificate_valid_number):
+                print "boban"
+            return self.certificate_valid_length / float(self.certificate_valid_number)
+        return 0
+
+    # 19
+    def get_standart_deviation_cert_length(self):
+        # self.check_zero_dividing(self.certificate_valid_number, "certificate_valid_number is 0 !!!")
+        if self.certificate_valid_number != 0:
+            EX = self.certificate_valid_length / self.certificate_valid_number
+            EX2 = self.certificate_valid_length_pow / self.certificate_valid_number
+            DX = EX2 - (EX * EX)
+            # if DX < 0:
+            #     print "EX:", (EX*EX)
+            #     print "EX2:", EX2
+            #     print "DX:", DX
+            #     print self.temp_list
+            #     print "std:", numpy.std(self.temp_list)
+            #     print len(self.x509_list)
+            return pow(DX, 0.5)
+        return 0
+
+    # ---------------------------------------------
+    # 20 Validity of the certificate during the capture
+    def is_valid_certificate_during_capture(self):
+        return self.not_valid_certificate_number
+
+    # 21 Amount of different certificates
     def get_amount_diff_certificates(self):
         return len(self.certificate_serial_dict.keys())
 
     # -------------------------------------------------------
-    # 14 Number of domains in certificate
+    # 22 Number of domains in certificate
     def get_number_of_domains_in_certificate(self):
         if self.number_san_domains_index != 0:
             return self.number_san_domains / float(self.number_san_domains_index)
         return 0
 
-    # -------------------------------------------------------
-    # 15 A flow has port 443(or 936, etc..), but there is no ssl log
-    # SSL ports:
-    # 2083, 2087, 2096, 995, 993, 465, 443, 990, 2078, 8443
-
-    #--------------------------------------------------------------
-    # 16 Certificate ratio
+    # 23 Certificate ratio
     def get_certificate_ratio(self):
         return self.cert_percent_validity
 
-    # 17 inbound packets == resp_pkts (18)
-    # Number of packets that the responder sent.
-    def get_inbound_pckts(self):
-        return self.inbound_packtes
-
-    # 18 outbound packets == orig_pkts (16)
-    def get_outbound_pckts(self):
-        return self.outbound_packtes
-
-    # 19 Certificate path
+    # 24 Certificate path
     # number of signed certificate in our first certificate
     def get_number_of_certificate_path(self):
         up = 0
@@ -451,29 +493,12 @@ class Connection4tuple:
             return up/float(down)
         return 0
 
-    # 20 x509/ssl ratio
+    # 25 x509/ssl ratio
     # ratio about how many ssl log has x509 in this connection
     def x509_ssl_ratio(self):
         return len(self.x509_list) / float(len(self.ssl_logs_list))
 
-    # 21 periodicity
-    # a] Average of periodicity
-    def get_periodicity_average(self):
-        per_list = self.get_periodicity_list()
-        sum = 0
-        for i in range(len(per_list)):
-            sum += per_list[i]
-        return sum / float(len(per_list))
 
-    def get_periodicity_standart_deviation(self):
-        EX = self.get_periodicity_average()
-        per_list = self.get_periodicity_list()
-        sum = 0
-        for i in range(len(per_list)):
-            sum += pow(per_list[i], 2)
-        EX2 = sum / float(len(per_list))
-        DX = EX2 - EX * EX
-        return pow(DX, 0.5)
 
 
 
@@ -545,6 +570,9 @@ class Connection4tuple:
         self.number_of_ssl_logs = len(self.ssl_logs_list)
         return self.number_of_ssl_logs
 
+    def get_ssl_logs_list(self):
+        return self.ssl_logs_list
+
     def get_malware_label(self):
         return self.malware_label
 
@@ -557,6 +585,8 @@ class Connection4tuple:
     def get_certificate_key_type_dict(self):
         return self.certificate_key_type_dict
 
+    def get_ssl_uids_list(self):
+        return self.ssl_uids_list
     """
     Zero exception method
     """

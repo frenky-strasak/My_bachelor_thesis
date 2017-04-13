@@ -203,7 +203,68 @@ class EvaluateData(object):
     """
     --------------------------------------------------------------------------------------
     """
+
     def create_dataset(self):
+        index = 0
+        useful_ssl_flows = 0
+        all_flows = 0
+        malware = 0
+        normal = 0
+        space = '	'
+        with open("PlotData\\" + "result.txt", 'w') as f:
+            for key in self.connection_4_tuples.keys():
+                f.write(str(key) + space +
+                        str(self.connection_4_tuples[key].get_number_of_flows()) + space +
+                        str(self.connection_4_tuples[key].get_average_of_duration()) + space +
+                        str(self.connection_4_tuples[key].get_standard_deviation_duration()) + space +
+                        str(self.connection_4_tuples[key].get_percent_of_standard_deviation_duration()) + space +
+                        str(self.connection_4_tuples[key].get_total_size_of_flows_orig()) + space +
+                        str(self.connection_4_tuples[key].get_total_size_of_flows_resp()) + space +
+                        str(self.connection_4_tuples[key].get_ratio_of_sizes()) + space +
+                        str(self.connection_4_tuples[key].get_percent_of_established_states()) + space +
+                        str(self.connection_4_tuples[key].get_inbound_pckts()) + space +
+                        str(self.connection_4_tuples[key].get_outbound_pckts()) + space +
+                        str(self.connection_4_tuples[key].get_periodicity_average()) + space +
+                        str(self.connection_4_tuples[key].get_periodicity_standart_deviation()) + space +
+                        str(self.connection_4_tuples[key].get_ssl_ratio()) + space +
+                        str(self.connection_4_tuples[key].get_average_public_key()) + space +
+                        str(self.connection_4_tuples[key].get_tls_version_ratio()) + space +
+                        str(self.connection_4_tuples[key].get_average_of_certificate_length()) + space +
+                        str(self.connection_4_tuples[key].get_standart_deviation_cert_length()) + space +
+                        str(self.connection_4_tuples[key].is_valid_certificate_during_capture()) + space +
+                        str(self.connection_4_tuples[key].get_amount_diff_certificates()) + space +
+                        str(self.connection_4_tuples[key].get_number_of_domains_in_certificate()) + space +
+                        str(self.connection_4_tuples[key].get_certificate_ratio()) + space +
+                        str(self.connection_4_tuples[key].get_number_of_certificate_path()) + space +
+                        str(self.connection_4_tuples[key].x509_ssl_ratio()) + space +
+                        self.connection_4_tuples[key].get_label_of_connection() +
+                        "\n")
+                useful_ssl_flows += self.connection_4_tuples[key].get_number_of_ssl_flows()
+                all_flows += self.connection_4_tuples[key].get_number_of_flows()
+                if self.connection_4_tuples[key].get_label_of_connection() == 'NORMAL' and self.connection_4_tuples[key].get_amount_diff_certificates() == 0:
+                    print "#------", index, " connection:", key , "cert serilas:", self.connection_4_tuples[key].get_amount_diff_certificates()
+                    # print key
+                    # print "all flows:", self.connection_4_tuples[key].get_number_of_flows()
+                    # print "ssl logs:", self.connection_4_tuples[key].get_number_of_ssl_logs()
+                    # print "x509:", self.connection_4_tuples[key].get_size_of_x509_list()
+                    # print "label:", self.connection_4_tuples[key].get_label_of_connection()
+                    # print "ssl_logs:"
+                    temp_list = self.connection_4_tuples[key].get_ssl_logs_list()
+                    for i in range(len(temp_list)):
+                        print temp_list[i]
+                    index += 1
+                if self.connection_4_tuples[key].is_malware():
+                    malware += 1
+                else:
+                    normal += 1
+
+        f.close()
+        # print "usefull_ssl_flows", useful_ssl_flows
+        # print "all_flows", all_flows
+        # print "malware connection", malware
+        # print "normal connection", normal
+
+    def create_dataset_info(self):
         useful_ssl_flows = 0
         all_flows = 0
         malware = 0
@@ -220,6 +281,13 @@ class EvaluateData(object):
                         "\n")
                 useful_ssl_flows += self.connection_4_tuples[key].get_number_of_ssl_flows()
                 all_flows += self.connection_4_tuples[key].get_number_of_flows()
+
+                # print "------ connection ----------------"
+                # print key
+                # print self.connection_4_tuples[key].get_number_of_flows()
+                # print self.connection_4_tuples[key].get_number_of_ssl_logs()
+                # print self.connection_4_tuples[key].get_size_of_x509_list()
+                # print self.connection_4_tuples[key].get_label_of_connection()
 
                 if self.connection_4_tuples[key].is_malware():
                     malware += 1

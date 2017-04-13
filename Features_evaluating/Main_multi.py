@@ -46,4 +46,4 @@ if __name__ == "__main__":
     # Check tuples if each of them has 0 malware or 0 normal.
     process_logs.check_4_tuples()
     # Create plot data for current featues.
-    # process_logs.create_plot_data()
+    process_logs.create_plot_data()
