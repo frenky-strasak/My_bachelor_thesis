@@ -5,6 +5,7 @@ at least one single datsets. Single dataset is folder where you can find: bro fo
 """
 
 import sys
+from time import time
 
 import ConfigManager
 from PrintManager import __PrintManager__
@@ -12,6 +13,7 @@ from ProcessLogs import ProcessLogs
 
 if __name__ == "__main__":
 
+    t0 = time()
     __PrintManager__.welcome_main_multi()
 
     # The argument of this program should be name of the resulting plot data file.
@@ -45,5 +47,10 @@ if __name__ == "__main__":
 
     # Check tuples if each of them has 0 malware or 0 normal.
     process_logs.check_4_tuples()
+    # Plot Certificate info
+    process_logs.print_certificates()
     # Create plot data for current featues.
     process_logs.create_plot_data()
+
+    t1 = time()
+    print "<<< All dataset successfully finished in aproximate time: %f" % ((t1 - t0)/60.0) + " min."

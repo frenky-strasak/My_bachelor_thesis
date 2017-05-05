@@ -5,6 +5,7 @@ from PrintManager import __PrintManager__
 from EvaluateData import EvaluateData
 from Connection_4_tuple import Connection4tuple
 from CertificatesSerial import CertificateSerial
+import os
 
 
 class ProcessLogs(EvaluateData):
@@ -19,6 +20,7 @@ class ProcessLogs(EvaluateData):
 
         self.is_computed_443feature = False
         self.all_conn_dict = dict()
+        self.control_ssl_uids_dict = dict()
 
         self.number_ssl_logs = 0
         self.number_x509_logs = 0
@@ -47,18 +49,27 @@ class ProcessLogs(EvaluateData):
 
         with open(path_to_dataset + "\\bro\\ssl.log") as ssl_file:
             for ssl_line in ssl_file:
-                if '#' in ssl_line:
+                if '#' == ssl_line[0]:
                     continue
                 count_lines += 1
 
                 ssl_split = ssl_line.split('	')
                 ssl_uid = ssl_split[1]
 
+                # if same ssl, continue (in some ssl.log files are more same ssl lines. It is probably bro error)
+                try:
+                    if self.control_ssl_uids_dict[ssl_uid]:
+                        continue
+                except:
+                    self.control_ssl_uids_dict[ssl_uid] = 1
+
+                # find flow in conn.log by this ssl uid.
                 try:
                     conn_log = self.con_dict[ssl_uid]
                 except:
-                    print "Error: ssl log does not have conn log !!!"
-                    break
+                    # print "Error: ssl log does not have conn log !!!"
+                    # break
+                    continue
 
                 conn_split = conn_log.split('	')
                 # 2-srcIpAddress, 4-dstIpAddress, 5-dstPort, 6-Protocol
@@ -66,12 +77,15 @@ class ProcessLogs(EvaluateData):
                 try:
                     label = conn_split[21]
                 except IndexError:
-                    label = "False"
+                    print "Error: no label in conn line."
 
                 if 'Background' in label or 'No_Label' in label:
                     background_flows += 1
+                    print "Error: Sakra divny."
                     continue
 
+                if not('Botnet' in label) and not('Normal') in label:
+                    print "Error: Dear more, there are more states of labels !!!!"
 
                 # file_hitrate += self.find_uid(path_to_dataset, ssl_uid)
 
@@ -83,10 +97,10 @@ class ProcessLogs(EvaluateData):
                     self.connection_4_tuples[connection_index].add_ssl_flow(conn_log, label)
 
                 # x509 and ssl
-                valid_x509_list = self.split_ssl(ssl_line, connection_index)
+                valid_x509_list = self.split_ssl(ssl_line, connection_index, label)
                 number_of_adding_x509 += len(valid_x509_list)
 
-                self.connection_4_tuples[connection_index].add_ssl_log(ssl_line, valid_x509_list)
+                self.connection_4_tuples[connection_index].add_ssl_log(ssl_line, valid_x509_list, os.path.basename(path_to_dataset))
                 number_adding_ssl += 1
 
                 # --------- just for printing for sebas -------
@@ -100,33 +114,10 @@ class ProcessLogs(EvaluateData):
 
         self.con_dict = dict()
         self.x509_dict = dict()
+        self.control_ssl_uids_dict = dict()
         # Just pint information about file and 4-tuples and their flows.
         self.count_statistic_of_conn(count_lines, background_flows, number_adding_ssl, number_of_adding_x509)
-        print "number_not_adding_ssl", self.not_added_x509
-
-
-    """
-    -------------------------------------------------------------------
-    Temp function
-    -------------------------------------------------------------------
-    """
-    def find_uid(self, path_to_dataset ,conn_uid):
-        rdp_hitrate = 0
-        with open(path_to_dataset + '\\bro\\rdp.log') as f:
-            for line in f:
-                if '#' in line:
-                    continue
-                split = line.split('	')
-                uid = split[1]
-                if conn_uid == uid:
-                    rdp_hitrate += 1
-        f.close()
-        # print "rdp hit", rdp_hitrate
-
-        return rdp_hitrate
-
-
-
+        # print "number_not_adding_ssl", self.not_added_x509
 
 
     """
@@ -135,15 +126,19 @@ class ProcessLogs(EvaluateData):
     def load_conn_file(self, path_to_dataset):
         with open(path_to_dataset + '\\bro\\conn_label.log') as f:
             for line in f:
-                if '#' in line:
+                if '#' == line[0]:
                     continue
                 split = line.split('	')
                 conn_uid = split[1]
+                label = split[21]
+                if 'Background' in label or 'No_Label' in label:
+                    continue
                 try:
                     if self.con_dict[conn_uid]:
                         print "Error: There are more conn log with same uid !!!"
                 except:
                     self.con_dict[conn_uid] = line
+                # self.con_dict[conn_uid] = line
         f.close()
 
 
@@ -151,43 +146,64 @@ class ProcessLogs(EvaluateData):
     Just load x509.log to dictionary.
     """
     def load_x509_file(self, path_to_dataset):
-            count_lines = 0
-            try:
-                with open(path_to_dataset + "\\bro\\x509.log") as f:
-                    # go thru ssl file line by line and for each ssl line check all uid of flows
-                    for line in f:
-                        if '#' in line:
-                            continue
-                        split = line.split('	')
-                        x509_uid = split[1]
-                        cert_serial = split[3]
+        """
+         Read started_file.txt where is time when capture of this dataset starts. Some datasets have starting 
+         time 1.1. 1970 00:00:00. So we have to add to time 
+         If this file does not exist, dataset has right format time.
+        """
+        started_unix_time = 0.0
+        try:
+            with open(path_to_dataset + "\\start_date.txt") as f:
+                started_unix_time = float(f.readlines()[1])
+            f.close()
+        except:
+            pass
 
-                        try:
-                            self.x509_dict[x509_uid].append(line)
-                            # print "Error: [load function] more uids in x509!!!", x509_uid
-                        except:
-                            self.x509_dict[x509_uid] = []
-                            self.x509_dict[x509_uid].append(line)
+        count_lines = 0
+        try:
+            with open(path_to_dataset + "\\bro\\x509.log") as f:
+                # go thru ssl file line by line and for each ssl line check all uid of flows
+                for line in f:
+                    if '#' == line[0]:
+                        continue
+                    split = line.split('	')
 
-                        count_lines += 1
-                f.close()
-            except IOError:
-                print "Error: No x509 file."
-            # print "len dict of x509", len(self.x509_dict)
-            # __PrintManager__.processLog_number_of_addes_x509(count_lines)
+                    """
+                    Change time, because some datasets are from 1.1 1970 00:00:00.
+                    """
+                    time_new = float(split[0]) + started_unix_time
+                    new_line = str(time_new)
+                    for i in range(1, len(split)):
+                        new_line += '	' + split[i]
+
+                    x509_uid = split[1]
+                    try:
+                        self.x509_dict[x509_uid].append(new_line)
+                        # print "Error: [load function] more uids in x509!!!", x509_uid
+                    except:
+                        self.x509_dict[x509_uid] = []
+                        self.x509_dict[x509_uid].append(new_line)
+
+                    count_lines += 1
+            f.close()
+        except IOError:
+            print "Error: No x509 file."
+        # print "len dict of x509", len(self.x509_dict)
+        # __PrintManager__.processLog_number_of_addes_x509(count_lines)
 
 
     '''
     Methods for adding not ssl flow from conn.log to connection-4tuple
     '''
     def add_not_ssl_logs(self, path_to_dataset):
+        print "     <<< adding not ssl flow:"
         not_ssl_conn = 0
         ssl_conn = 0
         no_idea = 0
         malicious_flows = 0
         with open(path_to_dataset + '\\bro\\conn_label.log') as f:
             for line in f:
-                if '#' in line:
+                if '#' == line[0]:
                     continue
                 conn_split = line.split('	')
                 # 2-srcIpAddress, 4-dstIpAddress, 5-dstPort, 6-Protocol
@@ -211,25 +227,13 @@ class ProcessLogs(EvaluateData):
                             not_ssl_conn += 1
                 except:
                     # Connections which are normal or botnet but they don't have ssl 4-tuple object.
-                    if 'Botnet' in label or 'Normal' in label:
-                        no_idea += 1
-                    else:
-                        print "label: ", label
-                        # pass
-
-                # ---------- checking 443 feature --------
-                if self.is_computed_443feature:
-                    if conn_split[5] == '443':
-                        if self.all_conn_dict[connection_index][0] == 0:
-                            print "hey more ..."
-                            malicious_flows += 1
-
+                    pass
 
         f.close()
 
-        print "     <<< not ssl conn:", not_ssl_conn
-        print "     <<< ssl conn:", ssl_conn
-        print "     <<< con without ssl 4-tuple object:", no_idea
+        print "          <<< not ssl conn:", not_ssl_conn
+        print "          <<< ssl conn:", ssl_conn
+        # print "          <<< con without ssl 4-tuple object:", no_idea
 
 
     '''
@@ -239,12 +243,12 @@ class ProcessLogs(EvaluateData):
     '''
     Just checking function, that each x509uid from ssl log is found in x509 file.
     '''
-    def split_ssl(self, ssl_line, tuple_index):
+    def split_ssl(self, ssl_line, tuple_index, label):
         split = ssl_line.split('	')
         if '-' == split[14] or '(object)' == split[14]:
             self.not_added_x509 += 1
             return []
-        self.put_server_name_to_dict(split[1], split[9], tuple_index, split[14].split(','))
+        self.put_server_name_to_dict(split[1], split[9], tuple_index, split[14], label)
         return [self.get_x509_lines(split[14].split(','))]
 
     '''
@@ -265,8 +269,9 @@ class ProcessLogs(EvaluateData):
         return x509_line
 
     # certificate dict
-    def put_server_name_to_dict(self, ssl_uid, server_name, tuple_index, x509_uids_list):
-        uid_x509 = x509_uids_list[0]
+    def put_server_name_to_dict(self, ssl_uid, server_name, tuple_index, x509_uids_list, label):
+        splited_x509_uids = x509_uids_list.split(',')
+        uid_x509 = splited_x509_uids[0]
         try:
             if self.x509_dict[uid_x509]:
                 x509_line = self.x509_dict[uid_x509][0]
@@ -274,11 +279,10 @@ class ProcessLogs(EvaluateData):
                 cert_serial = x509_split[3]
                 try:
                     if self.certificate_dict[cert_serial]:
-                        if not(self.certificate_dict[cert_serial].is_server_in_list(server_name)):
-                            self.certificate_dict[cert_serial].add_server_name(x509_split[1], server_name, ssl_uid, tuple_index)
+                        self.certificate_dict[cert_serial].add_server_name(server_name, label)
                 except:
-                    self.certificate_dict[cert_serial] = CertificateSerial(cert_serial, x509_split[1])
-                    self.certificate_dict[cert_serial].add_server_name(x509_split[1], server_name, ssl_uid, tuple_index)
+                    self.certificate_dict[cert_serial] = CertificateSerial(cert_serial, x509_line)
+                    self.certificate_dict[cert_serial].add_server_name(server_name, label)
         except:
             print "Error: [put_server_name] In ProcessLogs.py x509 does not have this x509uid:", uid_x509
 
@@ -288,6 +292,10 @@ class ProcessLogs(EvaluateData):
     def print_connection_4_tuple(self):
         for key in self.connection_4_tuples.keys():
             self.connection_4_tuples[key].print_features()
+
+    """
+     -------------------- check_4_tuples --------------------------------
+    """
 
     # This method checks error in connection 4-tuple.
     # So if 4-tuple contains some malware flows and some normal goodonesIPs, that is error!!!
@@ -300,16 +308,47 @@ class ProcessLogs(EvaluateData):
         not_ssl_malware_flows = 0
         ssl_normal_flows = 0
         not_ssl_normal_flows = 0
+        normal_cert = 0
+        malware_cert = 0
+        normal_connections = 0
+        malware_connections = 0
         for key in self.connection_4_tuples.keys():
+
+            """
+            implementig feature: connection which have no certificate, but have at least one SNI,
+            look, if in certificate_objects_dict is such servername with certificate
+            """
+            break_v = 0
+            if self.connection_4_tuples[key].get_amount_diff_certificates() == 0:
+
+                server_names = self.connection_4_tuples[key].get_SNI_list()
+                if len(server_names) != 0:
+                    for cert_serial in self.certificate_dict.keys():
+                        for server_name in server_names:
+                            x509_line = self.certificate_dict[cert_serial].contain_server_name(server_name)
+                            if x509_line != 0:
+                                self.connection_4_tuples[key].add_ssl_log_2(x509_line)
+                                print "This Certificate was added after process:", "cert_serial:", cert_serial, "server_name=",server_name, "4-tuple=", key,\
+                                    "label:", self.connection_4_tuples[key].get_label_of_connection()
+                                break_v = 1
+                                break
+                        if break_v == 1:
+                            break
+
+
             # Count number of all flows.
             if self.connection_4_tuples[key].is_malware():
                 all_malware_flows += self.connection_4_tuples[key].get_number_of_flows()
                 ssl_malware_flows += self.connection_4_tuples[key].get_number_of_ssl_flows()
                 not_ssl_malware_flows += self.connection_4_tuples[key].get_number_of_not_ssl_flows()
+                malware_cert += self.connection_4_tuples[key].get_amount_diff_certificates()
+                malware_connections += 1
             else:
                 all_normal_flows += self.connection_4_tuples[key].get_number_of_flows()
                 ssl_normal_flows += self.connection_4_tuples[key].get_number_of_ssl_flows()
                 not_ssl_normal_flows += self.connection_4_tuples[key].get_number_of_not_ssl_flows()
+                normal_cert += self.connection_4_tuples[key].get_amount_diff_certificates()
+                normal_connections += 1
 
             if self.connection_4_tuples[key].get_malware_label() != 0 and \
                             self.connection_4_tuples[key].get_normal_label() != 0:
@@ -322,7 +361,7 @@ class ProcessLogs(EvaluateData):
         space_1 = "     "
         space_2 = "         "
         print space_1 + "<<< Used flows in all connections:"
-        print space_2 + "<<< Malwares::"
+        print space_2 + "<<< Malwares:"
         print space_2 + "<<< all malware flows:", all_malware_flows
         print space_2 + "<<< ssl malware flows:", ssl_malware_flows
         print space_2 + "<<< NOT ssl malware flows:", not_ssl_malware_flows
@@ -330,6 +369,12 @@ class ProcessLogs(EvaluateData):
         print space_2 + "<<< all normal flows:", all_normal_flows
         print space_2 + "<<< ssl normal flows:", ssl_normal_flows
         print space_2 + "<<< NOT ssl normal flows:", not_ssl_normal_flows
+        print space_2 + "<<< Certificates"
+        print space_2 + "<<< number of normal certificate:", normal_cert
+        print space_2 + "<<< number of malware certificate:", malware_cert
+        print space_2 + "<<< Connections:"
+        print space_2 + "<<< number of normal connection:", normal_connections
+        print space_2 + "<<< number of malware connection:", malware_connections
 
         if no_variants == 0:
             __PrintManager__.processLog_result_1_of_check()
@@ -344,6 +389,26 @@ class ProcessLogs(EvaluateData):
         print "x509 together:", self.number_x509_logs
         print "number of connection:",len(self.connection_4_tuples.keys())
 
+
+    """
+     -------------------- check_4_tuples --------------------------------
+    """
+
+    def print_certificates(self):
+        print "\n------------------------------ Certificates info ------------------------------"
+        normal_certificate = 0
+        malware_certificate = 0
+        for key in self.certificate_dict.keys():
+            # print "--------------", key, "--------------------------"
+            if self.certificate_dict[key].is_malware():
+                malware_certificate += 1
+            else:
+                normal_certificate += 1
+
+        print "normal_certificate:", normal_certificate
+        print "malware_certificate:", malware_certificate
+
+
     # Number of flows for using: normal = 343113  + malware = 338468  = 681581
     def count_statistic_of_conn(self, number_of_lines, background_flows, number_adding_ssl, number_of_adding_x509):
         # Count number of malware 4-tuples and malware 4-tuples for printing statistic.
@@ -354,8 +419,13 @@ class ProcessLogs(EvaluateData):
 
         for key in self.connection_4_tuples.keys():
 
+            # print self.connection_4_tuples[key].get_datsets_names_list()
+
             if self.connection_4_tuples[key].get_uid_flow_dict_length() != self.connection_4_tuples[key].get_number_of_flows():
                     print "Error: dict and array are not same !!!!!"
+                    print self.connection_4_tuples[key].get_uid_flow_dict()
+                    # print self.connection_4_tuples[key].get_uid_flow_dict()
+
 
             if self.connection_4_tuples[key].is_malware():
                 malware_tuples += 1

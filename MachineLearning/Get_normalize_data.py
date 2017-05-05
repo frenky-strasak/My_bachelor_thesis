@@ -4,8 +4,9 @@
 3. call some machine learning algorithm.
 """
 
-import SVM
-
+import DetectionMethods
+from ast import literal_eval
+import numpy as np
 
 def get_column(matrix, i):
     return [row[i] for row in matrix]
@@ -24,7 +25,8 @@ def normalize_data(data):
                 max = data[j][i]
         if max != 0:
             for j in range(len(data)):
-                data[j][i] = data[j][i] / float(max)
+                if data[j][i] != -1:
+                    data[j][i] = data[j][i] / float(max)
     return data
 
 
@@ -35,6 +37,10 @@ def read_res(path):
     test_data = []
     test_labels = []
 
+    malware_conn = 0
+    normal_conn = 0
+    threshold = 1600
+    # threshold = 600
     # [0] - index
     # [24] - label
     index = 0
@@ -42,26 +48,34 @@ def read_res(path):
         for line in f:
             split = line.split('	')
             temp = []
-            if index < 600:
+            if index < threshold:
                 for i in range(1, len(split)-1):
                     temp.append(float(split[i]))
                 train_data.append(temp)
                 if 'MALWARE' in split[24]:
                     train_labels.append(1)
+                    malware_conn += 1
                 else:
                     train_labels.append(0)
+                    normal_conn += 1
             else:
                 for i in range(1, len(split)-1):
                     temp.append(float(split[i]))
                 test_data.append(temp)
                 if 'MALWARE' in split[24]:
                     test_labels.append(1)
+                    malware_conn += 1
                 else:
                     test_labels.append(0)
+                    normal_conn += 1
 
             index += 1
 
     f.close()
+
+    # print "number of malware conn:", malware_conn
+    # print "number of normal conn:", normal_conn
+
     return train_data, train_labels, test_data, test_labels
 
 
@@ -74,45 +88,63 @@ def main(path):
     return norm_train_data, train_labels, norm_test_data, test_labels
 
 
-def read_res2(path):
-    malware_data = []
-
-    normal_data = []
-
+def read_res2(path, file_name):
+    data = []
+    labels = []
     # [0] - index
     # [24] - label
     index = 0
-    with open(path) as f:
+    with open(path + file_name) as f:
         for line in f:
             split = line.split('	')
             temp = []
-            if 'MALWARE' in split[24]:
-                for i in range(1, len(split) - 1):
+            label = split[29]
+            started_index = 2
+            end_index = len(split) -1
+            # started_index = 22
+            # end_index = len(split) -1
+            if 'MALWARE' in label:
+                for i in range(started_index, end_index):
                     temp.append(float(split[i]))
-                malware_data.append(temp)
-            if 'NORMAL' in split[24]:
-                for i in range(1, len(split) - 1):
+                data.append(temp)
+                labels.append(1)
+            if 'NORMAL' in label:
+                for i in range(started_index, end_index):
                     temp.append(float(split[i]))
-                normal_data.append(temp)
-
+                data.append(temp)
+                labels.append(0)
             index += 1
-
     f.close()
-    return malware_data, normal_data
+    print "number of lines:", index
+    return data, labels
 
 
-def main2(path):
-    malware_data, normal_data = read_res2(path)
-    norm_malware_data = normalize_data(malware_data)
-    norm_normal_data = normalize_data(normal_data)
-    return norm_malware_data, norm_normal_data
+def main2(path, file_name):
+    data, labels = read_res2(path, file_name)
+    norm_data = normalize_data(data)
+    return norm_data, labels
 
-#
-# if __name__ == '__main__':
-#     path = "c:/Users/frenk/Documents/Skola/Bachelor_thesis/My_bachelor_thesis/MachineLearning/Data_Connection/conn_result.txt"
-#     train_data, train_labels, test_data, test_labels = read_res(path)
-#     # print train_data
-#     norm_train_data = normalize_data(train_data)
-#     norm_test_data = normalize_data(test_data)
-#
-#     SVM.detect(norm_train_data, train_labels, norm_test_data, test_labels)
+"""
+Function for version 1
+"""
+def get_data_from_file(path, file_name):
+    data = []
+    with open(path + file_name) as f:
+        for line in f:
+            data.append(map(float, literal_eval(line)))
+    return data
+
+def get_labels_from_file(path, file_name):
+    labels = []
+    with open(path + file_name) as f:
+        for line in f:
+            labels.append(int(line.rstrip()))
+    return labels
+
+
+def get_all_data(path_to_folder):
+    X_train = get_data_from_file(path_to_folder, "X_train.txt")
+    X_test = get_data_from_file(path_to_folder, "X_test.txt")
+    y_train = get_labels_from_file(path_to_folder, "y_train.txt")
+    y_test = get_labels_from_file(path_to_folder, "y_test.txt")
+    return X_train, X_test, y_train, y_test

@@ -24,6 +24,7 @@ class EvaluateData(object):
         Write here, which data function you want to use.
         """
         self.create_dataset()
+        # self.print_data()
         # self.create_plot_data_file_1()
         # self.create_plot_data_file_2()
         # self.create_plot_data_file_3()
@@ -211,7 +212,7 @@ class EvaluateData(object):
         malware = 0
         normal = 0
         space = '	'
-        with open("PlotData\\" + "result.txt", 'w') as f:
+        with open("PlotData\\" + "conn_result.txt", 'w') as f:
             for key in self.connection_4_tuples.keys():
                 f.write(str(key) + space +
                         str(self.connection_4_tuples[key].get_number_of_flows()) + space +
@@ -237,32 +238,71 @@ class EvaluateData(object):
                         str(self.connection_4_tuples[key].get_certificate_ratio()) + space +
                         str(self.connection_4_tuples[key].get_number_of_certificate_path()) + space +
                         str(self.connection_4_tuples[key].x509_ssl_ratio()) + space +
+                        str(self.connection_4_tuples[key].SNI_ssl_ratio()) + space +
+                        str(self.connection_4_tuples[key].self_signed_ratio()) + space +
+                        str(self.connection_4_tuples[key].is_SNIs_in_SNA_dns()) + space +
+                        str(self.connection_4_tuples[key].get_SNI_equal_DstIP()) + space +
+                        str(self.connection_4_tuples[key].is_CNs_in_SNA_dns()) + space +
+
                         self.connection_4_tuples[key].get_label_of_connection() +
                         "\n")
                 useful_ssl_flows += self.connection_4_tuples[key].get_number_of_ssl_flows()
                 all_flows += self.connection_4_tuples[key].get_number_of_flows()
-                if self.connection_4_tuples[key].get_label_of_connection() == 'NORMAL' and self.connection_4_tuples[key].get_amount_diff_certificates() == 0:
-                    print "#------", index, " connection:", key , "cert serilas:", self.connection_4_tuples[key].get_amount_diff_certificates()
-                    # print key
-                    # print "all flows:", self.connection_4_tuples[key].get_number_of_flows()
-                    # print "ssl logs:", self.connection_4_tuples[key].get_number_of_ssl_logs()
-                    # print "x509:", self.connection_4_tuples[key].get_size_of_x509_list()
-                    # print "label:", self.connection_4_tuples[key].get_label_of_connection()
-                    # print "ssl_logs:"
-                    temp_list = self.connection_4_tuples[key].get_ssl_logs_list()
-                    for i in range(len(temp_list)):
-                        print temp_list[i]
-                    index += 1
-                if self.connection_4_tuples[key].is_malware():
-                    malware += 1
-                else:
-                    normal += 1
+
+                # if self.connection_4_tuples[key].is_malware():
+                #     malware += 1
+                # else:
+                #     normal += 1
 
         f.close()
         # print "usefull_ssl_flows", useful_ssl_flows
         # print "all_flows", all_flows
         # print "malware connection", malware
         # print "normal connection", normal
+
+    def print_data(self):
+        index = 0
+        for key in self.connection_4_tuples.keys():
+            if self.connection_4_tuples[key].get_label_of_connection() == 'NORMAL':
+                print "-------------------------------------------------------------------------------"
+                print "#------", index, self.connection_4_tuples[key].get_label_of_connection(), \
+                    "connection:", key, "cert serilas:", self.connection_4_tuples[key].get_amount_diff_certificates()
+                print self.connection_4_tuples[key].get_datsets_names_list()
+                print "\n-------------------------------------------------------------------------------"
+                # print key
+                # print "all flows:", self.connection_4_tuples[key].get_number_of_flows()
+                # print "ssl logs:", self.connection_4_tuples[key].get_number_of_ssl_logs()
+                # print "x509:", self.connection_4_tuples[key].get_size_of_x509_list()
+                # print "label:", self.connection_4_tuples[key].get_label_of_connection()
+                # print "ssl_logs:"
+                temp_list = self.connection_4_tuples[key].get_ssl_logs_list()
+                for i in range(len(temp_list)):
+                    print temp_list[i]
+                index += 1
+
+        print ""
+        print ""
+        print " -------------- Malwares ---------------------"
+        print ""
+        print ""
+
+        for key in self.connection_4_tuples.keys():
+            if self.connection_4_tuples[key].get_label_of_connection() == 'MALWARE':
+                print "-------------------------------------------------------------------------------"
+                print "#------", index, self.connection_4_tuples[key].get_label_of_connection(), \
+                    "connection:", key, "cert serilas:", self.connection_4_tuples[key].get_amount_diff_certificates()
+                print self.connection_4_tuples[key].get_datsets_names_list()
+                print "\n-------------------------------------------------------------------------------"
+                # print key
+                # print "all flows:", self.connection_4_tuples[key].get_number_of_flows()
+                # print "ssl logs:", self.connection_4_tuples[key].get_number_of_ssl_logs()
+                # print "x509:", self.connection_4_tuples[key].get_size_of_x509_list()
+                # print "label:", self.connection_4_tuples[key].get_label_of_connection()
+                # print "ssl_logs:"
+                temp_list = self.connection_4_tuples[key].get_ssl_logs_list()
+                for i in range(len(temp_list)):
+                    print temp_list[i]
+                index += 1
 
     def create_dataset_info(self):
         useful_ssl_flows = 0

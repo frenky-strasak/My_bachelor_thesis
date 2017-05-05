@@ -28,7 +28,9 @@ def find_files(url):
 
 def save_manager(url, dataset_name):
 
-    directiry_name = "c:/Users/frenk/Documents/Skola/Bachelor_thesis/Dataset/datasets_168-247/" + dataset_name
+    directiry_name = "c:/Users/frenk/Documents/Skola/Bachelor_thesis/normal_dataset/" + dataset_name
+
+
     if os.path.exists(directiry_name):
         shutil.rmtree(directiry_name)
     os.makedirs(directiry_name)

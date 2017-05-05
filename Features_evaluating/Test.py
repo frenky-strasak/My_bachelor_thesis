@@ -4,39 +4,31 @@ def read_conn(path):
     d = dict()
     infected_ips = dict()
     line_number = 0
-    with open(path + "bro/conn.log") as f:
+    with open(path + "bro/x509.log") as f:
         for line in f:
             line_number += 1
             if '#' == line[0]:
                 continue
             split = line.split('	')
-            try:
-                src_address = split[2]
-            except:
-                print "--------------"
-                print line
-                print line_number
-                print "--------------"
-            # label = split[21]
-            # if 'From-Botnet' in label:
-            #     try:
-            #         infected_ips[src_address] += 1
-            #     except:
-            #         infected_ips[src_address] = 1
-
-
-            try:
-                d[src_address] += 1
-            except:
-                d[src_address] = 1
+            print split[14]
+            san_dns = split[14].split(',')
+            for i in range(len(san_dns)):
+                if '*' in san_dns[i]:
+                    san_dns[i] = san_dns[i].replace('*', '')
+            print san_dns
+            break
     f.close()
-    print d
-    print line_number
-    # print infected_ips.keys()
 
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        path = sys.argv[1]
-        read_conn(path)
+    # if len(sys.argv) == 2:
+    #     path = sys.argv[1]
+    #     read_conn(path)
+
+
+    arr = [1,2,3,4,5,6]
+
+    for a in arr:
+        if a == 4:
+            print "prt"

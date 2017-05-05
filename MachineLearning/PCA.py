@@ -10,6 +10,7 @@ norm_train_data, train_labels, norm_test_data, test_labels = Get_normalize_data.
 data = norm_test_data + norm_test_data
 labels = train_labels + test_labels
 
+
 def plot_embedding(X , title=None):
     x_min, x_max = np.min(X, 0), np.max(X, 0)
     X = (X - x_min) / (x_max - x_min)

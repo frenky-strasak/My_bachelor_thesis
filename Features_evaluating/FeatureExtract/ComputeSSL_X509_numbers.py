@@ -25,6 +25,7 @@ def find_ssl_log(path, con_uids_dict):
     number_of_x509_M = 0
     number_of_x509_N = 0
 
+    ssl_dict = dict()
     index = 0
     normal_d = dict()
     malware_d = dict()
@@ -34,8 +35,17 @@ def find_ssl_log(path, con_uids_dict):
                 # print line
                 continue
 
-            split = line.split('	')
             index += 1
+            split = line.split('	')
+            ssl_uid = split[1]
+            try:
+                if ssl_dict[ssl_uid]:
+                    continue
+            except:
+                ssl_dict[ssl_uid] = 1
+
+
+
             if "Background" in con_uids_dict[split[1]]:
                 continue
 
