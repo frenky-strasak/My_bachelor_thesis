@@ -13,24 +13,14 @@ import Get_normalize_data
 import sys
 
 
-final_path = "Final_Experiment\\DividedData\\" + "all_features_2\\"
 
 
 """
 ------------------ Load train data ----------------------------------
 """
-norm_data_N, labels_N = Get_normalize_data.main2(final_path, "normal_connections.txt")
-norm_data_M, labels_M = Get_normalize_data.main2(final_path, "malware_connections.txt")
+final_path = "Final_Experiment\\DividedData\\" + "features_version_1\\"
 
-norm_data = norm_data_N + norm_data_M
-labels = labels_N + labels_M
-
-
-
-"""
---------------- Load test data ----------------------------
-"""
-norm_test_data, test_labels = Get_normalize_data.main2(final_path, "test_connections.txt")
+X_train, X_test, y_train, y_test = Get_normalize_data.get_all_data(final_path)
 
 
 
@@ -38,12 +28,12 @@ norm_test_data, test_labels = Get_normalize_data.main2(final_path, "test_connect
 print "Malware = 1"
 print "Normal = 0"
 
-X = norm_data + norm_test_data
-y = labels + test_labels
+X = X_train + X_test
+y = y_train + y_test
 
 print "amount of data to print:", len(X)
 
-def plot_embedding(X, title=None):
+def plot_embedding(draw_test_data, X, title=None):
     x_min, x_max = np.min(X, 0), np.max(X, 0)
     X = (X - x_min) / (x_max - x_min)
 
@@ -53,18 +43,20 @@ def plot_embedding(X, title=None):
     print "embeding, amount:", len(X)
     for i in range(len(X)):
         # draw testing and traing data
-        # if i < len(norm_data):
-        #     my_color = colors[0]
-        # else:
-        #     if y[i] == 0:
-        #         my_color = colors[1]
-        #     else:
-        #         my_color = colors[2]
+        if draw_test_data:
+            if i < len(X_train):
+                my_color = colors[0]
+            else:
+                if y[i] == 0:
+                    my_color = colors[1]
+                else:
+                    my_color = colors[2]
         # draw all data
-        if y[i] == 0:
-            my_color = colors[1]
         else:
-            my_color = colors[2]
+            if y[i] == 0:
+                my_color = colors[1]
+            else:
+                my_color = colors[2]
 
         plt.text(X[i, 0], X[i, 1], str(y[i]),
                  # color=plt.cm.Set1((1-y[i]) / 6.),
@@ -78,13 +70,26 @@ def plot_embedding(X, title=None):
 
 
 # t-SNE embedding of the digits dataset
-print("Computing t-SNE embedding")
+print("Computing T-SNE embedding")
 tsne = manifold.TSNE(n_components=2, init='pca', random_state=0)
 t0 = time()
 X_tsne = tsne.fit_transform(X)
 
-plot_embedding(X_tsne,
-               "t-SNE embedding of the digits (time %.2fs)" %
-               (time() - t0))
+# plot all data as 1 and 0
+plot_embedding(False, X_tsne,
+               "T-SNE - Train data + Test Data") #(time %.2fs)" % (time() - t0))
+# plot all data as 1 and 0 with color test data and black train data
+plot_embedding(True, X_tsne, "T-SNE Train data + Test Data")
+
+# plot train data
+plot_embedding(False, X_tsne[:len(X_train)], "T-SNE Train data")
+# plot train data
+plot_embedding(False, X_tsne[len(X_train):], "T-SNE Test Data")
+
+Get_normalize_data.write_to_file("X_train.txt", X_tsne[:len(X_train)])
+Get_normalize_data.write_to_file("y_train.txt", y[:len(X_train)])
+
+Get_normalize_data.write_to_file("X_test.txt", X_tsne[len(X_train):])
+Get_normalize_data.write_to_file("y_test.txt", y[len(X_train):])
 
 plt.show()

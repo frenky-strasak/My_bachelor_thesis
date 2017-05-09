@@ -13,7 +13,7 @@ with RBF kernel. We can see clearly that the training score is still around
 the maximum and the validation score could be increased with more training
 samples.
 """
-print(__doc__)
+# print(__doc__)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,7 +24,8 @@ from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
 import Get_normalize_data
 from sklearn.neural_network import MLPClassifier
-
+from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
@@ -97,30 +98,54 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
 if __name__ == '__main__':
 
-    final_path = final_path = "Final_Experiment\\DividedData\\" + "all_features_2\\"
-    norm_data_N, labels_N = Get_normalize_data.main2(final_path, "normal_connections.txt")
-    norm_data_M, labels_M = Get_normalize_data.main2(final_path, "malware_connections.txt")
+    final_path = "Final_Experiment\\DividedData\\" + "data_model_1\\"
 
-    norm_data = norm_data_N + norm_data_M
-    labels = labels_N + labels_M
+    X_train, X_test, y_train, y_test = Get_normalize_data.get_all_data(final_path)
 
-    X, y = norm_data, labels
 
-    title = "Learning Curves (SVM, RBF kernel, $\gamma=0.001$)"
+
+    X, y = X_train, y_train
+
+
     # SVC is more expensive so we do a lower number of CV iterations:
-    cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
+    cv = ShuffleSplit(n_splits=10)# , test_size=0.2, random_state=0)
 
     """
     ---------------  SVM  --------------------------
-    # """
-    kernels = ['linear', 'poly', 'rbf']
-    estimator = SVC(kernel=kernels[2], C=100, gamma=1)
+    """
+    # title = "Learning Curve ( SVM with rbf kernel )"
+    # kernels = ['linear', 'poly', 'rbf']
+    # estimator = SVC(kernel=kernels[2], C=110, gamma=0.1)
     """
     --------------- NN ------------------------------
     """
-    # estimator = MLPClassifier(hidden_layer_sizes=(100, 100), max_iter=400, alpha=1e-4,
-    #                     solver='sgd', verbose=0, tol=1e-4, random_state=1)
+    # title = "Learning Curves (Neural Network alpha=1e-05$)"
+    # estimator = MLPClassifier(solver='adam', alpha=1e-05, random_state=1)
+    """
+    ------------ XGBoost --------------------------
+    """
+    # title = "Learning Curves ( XGBoost s)"
+    # estimator = XGBClassifier(learning_rate=0.1,
+    #                       n_estimators=1000,
+    #                       max_depth=10,
+    #                       min_child_weight=1,
+    #                       gamma=0,
+    #                       subsample=0.8,
+    #                       colsample_bytree=0.8,
+    #                       objective='binary:logistic',
+    #                       nthread=4,
+    #                       scale_pos_weight=1,
+    #                       seed=27)
+    #
+    # X = np.array(X)
+    # y = np.array(y)
+    """
+    ----------------- Random Forest ------------------
+    """
+    title = "Learning Curves ( Random forest )"
+    estimator = RandomForestClassifier(n_estimators=500, oob_score='TRUE')
 
-    plot_learning_curve(estimator, title, X, y, (0.7, 1.01), cv=cv, n_jobs=4)
+
+    plot_learning_curve(estimator, title, X, y, (0.7, 1.01), cv=cv, n_jobs=10)
 
     plt.show()

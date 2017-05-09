@@ -27,8 +27,5 @@ if __name__ == '__main__':
     #     read_conn(path)
 
 
-    arr = [1,2,3,4,5,6]
-
-    for a in arr:
-        if a == 4:
-            print "prt"
+    for i in range(0,28):
+        print "temp["+str(i)+'],'

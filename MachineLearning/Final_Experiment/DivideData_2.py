@@ -19,7 +19,7 @@ def normalize_data(data):
 
 def write_to_file(file_name, data_list):
     index = 0
-    with open("DividedData\\features_version_1\\" + file_name, 'w') as f:
+    with open("DividedData\\data_model_1\\" + file_name, 'w') as f:
         for dataline in data_list:
             f.write(str(dataline) + "\n")
             index += 1
@@ -78,7 +78,7 @@ norm_X = normalize_data(X)
 print "velikost naseho krasneho celeho X je:", len(X)
 
 # split data by sklearn library
-X_train, X_test, y_train, y_test = train_test_split(norm_X, y, test_size=.2, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(norm_X, y, test_size=.2, random_state=35)
 
 # Write train data
 write_to_file('X_train.txt', X_train)
@@ -91,32 +91,32 @@ write_to_file('y_test.txt', y_test)
 """
 Create part data model
 """
-normal_data = []
-normal_labels = []
-malware_data = []
-malware_labels = []
-test_data = []
-test_labels = []
-for i in range(len(X)):
-    if i%5 == 0:
-        test_data.append(X[i])
-        test_labels.append(y[i])
-    else:
-        if y[i] == 0:
-            normal_data.append(X[i])
-            normal_labels.append(y[i])
-        if y[i] == 1:
-            malware_data.append(X[i])
-            malware_labels.append(y[i])
+# normal_data = []
+# normal_labels = []
+# malware_data = []
+# malware_labels = []
+# test_data = []
+# test_labels = []
+# for i in range(len(X)):
+#     if i%5 == 0:
+#         test_data.append(X[i])
+#         test_labels.append(y[i])
+#     else:
+#         if y[i] == 0:
+#             normal_data.append(X[i])
+#             normal_labels.append(y[i])
+#         if y[i] == 1:
+#             malware_data.append(X[i])
+#             malware_labels.append(y[i])
 
-write_to_file_2('malware_X_train.txt', malware_data)
-write_to_file_2('malware_y_train.txt', malware_labels)
-
-write_to_file_2('normal_X_train.txt', normal_data)
-write_to_file_2('normal_y_train.txt', normal_labels)
-
-write_to_file_2('X_test.txt', test_data)
-write_to_file_2('y_test.txt', test_labels)
+# write_to_file_2('malware_X_train.txt', malware_data)
+# write_to_file_2('malware_y_train.txt', malware_labels)
+#
+# write_to_file_2('normal_X_train.txt', normal_data)
+# write_to_file_2('normal_y_train.txt', normal_labels)
+#
+# write_to_file_2('X_test.txt', test_data)
+# write_to_file_2('y_test.txt', test_labels)
 
 
 

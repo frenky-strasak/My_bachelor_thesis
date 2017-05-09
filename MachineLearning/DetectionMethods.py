@@ -1,6 +1,8 @@
 from sklearn import svm
 import numpy as np
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+from sklearn.metrics import confusion_matrix
 
 
 def detect(model, test_data, test_labels):
@@ -20,7 +22,7 @@ def detect(model, test_data, test_labels):
 
     results = (model.predict(test_data))
 
-    print model.score(test_data, test_labels)
+
     """
     Print and evaluate results.
     """
@@ -48,15 +50,19 @@ def detect(model, test_data, test_labels):
     print "false negative:", false_negative
     print "true negative:", true_negative
     print "----------------------------------------------"
+    print "library detection:", model.score(test_data, test_labels)
     print "good detect:", (true_negative + true_positive), ((true_negative + true_positive) / float(len(test_data)))
     print "bad detect:", (false_negative + false_positive), ((false_negative + false_positive) / float(len(test_data)))
     print "All connection:", len(test_data)
 
 
 def detect_with_cross_validation(model, norm_data, labels):
-    scores = cross_val_score(model, norm_data, labels, cv=4)
+    scores = cross_val_score(model, norm_data, labels, cv=10)
+
     print "----------------------------------"
     print "----- CROSSVALIDATION ------------"
     print "----------------------------------"
     print scores
+    print np.mean(scores)
+
 

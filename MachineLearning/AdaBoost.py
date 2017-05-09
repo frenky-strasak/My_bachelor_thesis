@@ -1,33 +1,47 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.datasets import make_gaussian_quantiles
 import Get_normalize_data
 import DetectionMethods
+from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn import svm
+from xgboost import XGBClassifier
 
-final_path = "Final_Experiment\\DividedData\\" + "all_features_2\\"
+final_path = "Final_Experiment\\DividedData\\" + "data_model_1\\"
 
-norm_data_N, labels_N = Get_normalize_data.main2(final_path, "normal_connections.txt")
-norm_data_M, labels_M = Get_normalize_data.main2(final_path, "malware_connections.txt")
-
-norm_data = norm_data_N + norm_data_M
-labels = labels_N + labels_M
+X_train, X_test, y_train, y_test = Get_normalize_data.get_all_data(final_path)
 
 """
  ----------- Learning ------------------
 """
 
 # Create and fit an AdaBoosted decision tree
-bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
-                         algorithm="SAMME.R",
-                         n_estimators=500)
+# bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), #0.910267471959
+#                          algorithm="SAMME.R",
+#                          n_estimators=500)
 
-bdt.fit(norm_data, labels)
+bdt = AdaBoostClassifier(RandomForestClassifier(n_estimators=500, oob_score='TRUE')) #0.939603106126
+
+
+# bdt = AdaBoostClassifier(XGBClassifier())
+
+
+# kernels = ['linear', 'poly', 'rbf']
+# estimator = svm.SVC(kernel=kernels[2], C=110, gamma=0.1)
+# bdt = AdaBoostClassifier(estimator, algorithm="SAMME")
+
+bdt.fit(X_train, y_train)
+
+"""
+Crossvalidation
+"""
+DetectionMethods.detect_with_cross_validation(bdt, X_train, y_train)
+
 
 """
 ------------- Testing -------------
 """
-norm_test_data, test_labels = Get_normalize_data.main2(final_path, "test_connections.txt")
-DetectionMethods.detect(bdt, norm_test_data, test_labels)
+DetectionMethods.detect(bdt, X_test, y_test)

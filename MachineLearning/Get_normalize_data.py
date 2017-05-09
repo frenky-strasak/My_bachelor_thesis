@@ -8,6 +8,26 @@ import DetectionMethods
 from ast import literal_eval
 import numpy as np
 
+###################
+### Methof fot T-SNE array output
+####################
+def write_to_file(file_name, data_list):
+    index = 0
+    with open("Final_Experiment\\DividedData\\T-SNE_data_model\\" + file_name, 'w') as f:
+        for dataline in data_list:
+            try:
+                label = int(dataline)
+                f.write(str(label) + "\n")
+            except:
+                f.write(str(list(dataline)) + "\n")
+            index += 1
+    f.close()
+    print file_name,"written lines:", index
+
+
+
+
+
 def get_column(matrix, i):
     return [row[i] for row in matrix]
 
@@ -131,7 +151,40 @@ def get_data_from_file(path, file_name):
     data = []
     with open(path + file_name) as f:
         for line in f:
-            data.append(map(float, literal_eval(line)))
+            # data.append(map(float, literal_eval(line)))
+            temp = map(float, literal_eval(line))
+            features = [
+                        temp[0],
+                        temp[1],
+                        temp[2],
+                        temp[3],
+                        temp[4],
+                        temp[5],
+                        temp[6],
+                        temp[7],
+                        temp[8],
+                        temp[9],
+                        temp[10],
+                        # temp[11],
+                        temp[12],
+                        temp[13],
+                        temp[14],
+                        temp[15],
+                        temp[16], #
+                        temp[17],
+                        temp[18],
+                        temp[19],
+                        temp[20],
+                        temp[21],
+                        temp[22],
+                        temp[23],
+                        temp[24],
+                        temp[25],
+                        temp[26],
+                        # temp[27]
+            ]
+
+            data.append(features)
     return data
 
 def get_labels_from_file(path, file_name):

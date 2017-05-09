@@ -14,7 +14,7 @@ class ProcessLogs(EvaluateData):
         self.name_of_result = name_of_result
         self.x509_dict = dict()
         self.con_dict = dict()
-        self.certificate_dict = dict()
+
 
         self.not_added_x509 = 0
 
@@ -280,9 +280,11 @@ class ProcessLogs(EvaluateData):
                 try:
                     if self.certificate_dict[cert_serial]:
                         self.certificate_dict[cert_serial].add_server_name(server_name, label)
+                        self.certificate_dict[cert_serial].add_x509_line(x509_line)
                 except:
                     self.certificate_dict[cert_serial] = CertificateSerial(cert_serial, x509_line)
                     self.certificate_dict[cert_serial].add_server_name(server_name, label)
+                    self.certificate_dict[cert_serial].add_x509_line(x509_line)
         except:
             print "Error: [put_server_name] In ProcessLogs.py x509 does not have this x509uid:", uid_x509
 

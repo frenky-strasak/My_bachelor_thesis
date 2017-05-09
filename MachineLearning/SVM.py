@@ -20,7 +20,7 @@ from sklearn import svm
 # print len(norm_data[0])
 
 
-final_path = "Final_Experiment\\DividedData\\" + "features_version_1\\"
+final_path = "Final_Experiment\\DividedData\\" + "data_model_1\\"
 
 X_train, X_test, y_train, y_test = Get_normalize_data.get_all_data(final_path)
 
@@ -39,7 +39,6 @@ DetectionMethods.detect_with_cross_validation(clf, X_train, y_train)
 
 # detect
 clf = svm.SVC(kernel=kernels[index], C=svm_C, gamma=svm_gamma)
-
 clf.fit(X_train, y_train)
 DetectionMethods.detect(clf, X_test, y_test)
 
