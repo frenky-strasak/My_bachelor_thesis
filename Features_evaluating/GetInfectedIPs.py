@@ -1,4 +1,7 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+"""
 This file goes to binetflow file, where you can find labels for each flow. It gives you all infected ip addresses.
 """
 import sys

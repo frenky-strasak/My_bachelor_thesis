@@ -1,4 +1,8 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
+"""
 ========================
 Plotting Learning Curves
 ========================
@@ -28,7 +32,7 @@ from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
-                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
+                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 10)):
     """
     Generate a simple plot of the test and training learning curve.
 
@@ -108,7 +112,7 @@ if __name__ == '__main__':
 
 
     # SVC is more expensive so we do a lower number of CV iterations:
-    cv = ShuffleSplit(n_splits=10)# , test_size=0.2, random_state=0)
+    cv = ShuffleSplit(n_splits=20 , random_state=0)
 
     """
     ---------------  SVM  --------------------------
@@ -123,29 +127,33 @@ if __name__ == '__main__':
     # estimator = MLPClassifier(solver='adam', alpha=1e-05, random_state=1)
     """
     ------------ XGBoost --------------------------
-    """
-    # title = "Learning Curves ( XGBoost s)"
-    # estimator = XGBClassifier(learning_rate=0.1,
-    #                       n_estimators=1000,
-    #                       max_depth=10,
-    #                       min_child_weight=1,
-    #                       gamma=0,
-    #                       subsample=0.8,
-    #                       colsample_bytree=0.8,
-    #                       objective='binary:logistic',
-    #                       nthread=4,
-    #                       scale_pos_weight=1,
-    #                       seed=27)
-    #
-    # X = np.array(X)
-    # y = np.array(y)
+	# max depth = 4, overfitting, 0.96
+	# 1. max depth = 1, min_child_weight=1 , gamma=0, 89.5
+	# 2. max depth = 3, min_child_weight=5, gamma=0.1, 95.5
+	# 3. max_depth = 2, min_child_weight=5, gamma= 0.1 94.5
+	"""
+    title = "Learning Curves ( XGBoost s)"
+    estimator = XGBClassifier(learning_rate=0.1,
+                          n_estimators=1000,
+                          max_depth=3,
+                          min_child_weight=5,
+                          gamma=0.1,
+                          subsample=0.8,
+                          colsample_bytree=0.8,
+                          objective='binary:logistic',
+                          nthread=4,
+                          scale_pos_weight=1,
+                          seed=27)
+    
+    X = np.array(X)
+    y = np.array(y)
     """
     ----------------- Random Forest ------------------
     """
-    title = "Learning Curves ( Random forest )"
-    estimator = RandomForestClassifier(n_estimators=500, oob_score='TRUE')
+    # title = "Learning Curves ( Random forest )"
+    # estimator = RandomForestClassifier(n_estimators=500, oob_score='TRUE')
 
 
-    plot_learning_curve(estimator, title, X, y, (0.7, 1.01), cv=cv, n_jobs=10)
+    plot_learning_curve(estimator, title, X, y, cv=cv, n_jobs=10)
 
     plt.show()

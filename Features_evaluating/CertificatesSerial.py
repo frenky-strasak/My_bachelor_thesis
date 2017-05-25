@@ -1,3 +1,6 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
 
 class CertificateSerial:
 
@@ -20,7 +23,7 @@ class CertificateSerial:
     def process_certificate(self, x509_line):
         self.is_CN_in_SAN(x509_line)
 
-        split = x509_line.split(',')
+        split = x509_line.split('	')
 
         self.certificate_key_length = float(split[11])
 
@@ -60,7 +63,7 @@ class CertificateSerial:
         return False
 
     def add_x509_line(self, x509_line):
-        split = x509_line.split(',')
+        split = x509_line.split('	')
 
         if split[7] != '-' and split[6] != '-':
             try:

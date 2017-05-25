@@ -1,3 +1,7 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap

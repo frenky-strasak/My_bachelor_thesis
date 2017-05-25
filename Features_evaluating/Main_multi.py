@@ -1,4 +1,7 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+"""
 python Main_multi.py
 This Main is multi, because it processes more single data sets. It means there is a folder where you can find
 at least one single datsets. Single dataset is folder where you can find: bro folder, pcap file and binetflow file.

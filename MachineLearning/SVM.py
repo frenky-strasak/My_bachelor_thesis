@@ -1,4 +1,8 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
+"""
 python Learn_Manager.py c:\Users\frenk\Documents\Skola\Bachelor_thesis\My_bachelor_thesis\MachineLearning\Experiment_results\2017_04_20_2127conn\
 """
 
@@ -20,11 +24,11 @@ from sklearn import svm
 # print len(norm_data[0])
 
 
-final_path = "Final_Experiment\\DividedData\\" + "data_model_1\\"
+final_path = "Final_Experiment\\DividedData\\" + "cert_data_model\\"
 
 X_train, X_test, y_train, y_test = Get_normalize_data.get_all_data(final_path)
 
-kernels = ['linear', 'poly', 'rbf']
+kernels = ['linear', 'poly', 'rbf', 'sigmoid']
 svm_C = 110
 svm_gamma = 0.1
 index = 2

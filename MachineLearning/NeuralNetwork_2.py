@@ -1,3 +1,7 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -15,7 +19,8 @@ import xgboost
 
 
 # final_path = "Final_Experiment\\DividedData\\" + "features_parts\\"
-final_path = "Final_Experiment\\DividedData\\" + "data_model_1\\"
+# final_path = "Final_Experiment\\DividedData\\" + "data_model_1\\"
+final_path = "Final_Experiment\\DividedData\\" + "cert_data_model\\"
 print "Reading DateModel from:", final_path
 
 

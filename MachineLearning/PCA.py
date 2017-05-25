@@ -1,3 +1,7 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
 import numpy as np
 from sklearn.decomposition import IncrementalPCA
 import matplotlib.pyplot as plt

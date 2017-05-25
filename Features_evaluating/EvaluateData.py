@@ -1,4 +1,7 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+"""
 This class is parent class of ProcessLogs class.
 There is stored a "connection_4_tuple" dicttionry, which contains all "connection 4-tuples" objects.
 Next, there are function for creating data models. This data models are used for plotting figures.
@@ -25,7 +28,7 @@ class EvaluateData(object):
         Write here, which data function you want to use.
         """
         # self.create_dataset()
-        self.create_cert_dataset()
+        # self.create_cert_dataset()
 
         # self.print_data()
         # self.create_plot_data_file_1()
@@ -266,7 +269,7 @@ class EvaluateData(object):
 
     def create_cert_dataset(self):
         space = '	'
-        with open("PlotData\\" + "cert_result.txt", 'w') as f:
+        with open("PlotData\\" + "cert_result_2017_05_10.txt", 'w') as f:
             for key in self.certificate_dict.keys():
                 f.write(str(key) + space +
 

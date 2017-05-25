@@ -1,3 +1,6 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
 import ConfigParser
 import glob
 import os

@@ -1,3 +1,7 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
 import Get_normalize_data
 import DetectionMethods
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
@@ -10,7 +14,7 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 """
 Read data model 1
 """
-final_path = "Final_Experiment\\DividedData\\" + "data_model_1\\"
+final_path = "Final_Experiment\\DividedData\\" + "cert_data_model\\"
 X_train, X_test, y_train, y_test = Get_normalize_data.get_all_data(final_path)
 
 """

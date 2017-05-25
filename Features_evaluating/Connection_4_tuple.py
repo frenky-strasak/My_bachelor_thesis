@@ -1,4 +1,8 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
+"""
 This class stores all information for one "connection 4-tuple" object.
 Also it computes features.
 """
@@ -515,7 +519,7 @@ class Connection4tuple:
             # EX2 = sum / float(len(per_list))
             # DX = EX2 - EX * EX
             # return pow(DX, 0.5)
-            numpy.std(self.get_periodicity_list())
+            return numpy.std(self.get_periodicity_list())
         return -1
 
     # -----------------------------------------------------
@@ -658,7 +662,7 @@ class Connection4tuple:
     def get_SNI_equal_DstIP(self):
         return self.SNI_equal_DstIP
 
-    # 30 Is there any SNI, which not in san.dns ?
+    # 30 Is there any CN, which not in san.dns ?
     def is_CNs_in_SNA_dns(self):
         if len(self.is_CN_in_SAN_list) != 0:
             for a in self.is_CN_in_SAN_list:

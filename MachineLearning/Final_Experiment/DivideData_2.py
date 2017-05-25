@@ -19,7 +19,7 @@ def normalize_data(data):
 
 def write_to_file(file_name, data_list):
     index = 0
-    with open("DividedData\\data_model_1\\" + file_name, 'w') as f:
+    with open("DividedData\\cert_data_model\\" + file_name, 'w') as f:
         for dataline in data_list:
             f.write(str(dataline) + "\n")
             index += 1
@@ -42,7 +42,7 @@ all_tuples = []
 
 
 try:
-    with open("conn_result.txt") as f:
+    with open("cert_result.txt") as f:
     # with open("DividedData\\all_features_2\\malware_connections.txt") as f:
         for line in f:
             all_tuples.append(line)
@@ -53,21 +53,29 @@ except:
 
 X = []
 y = []
+
+malwares = 0
+normals = 0
 for line in all_tuples:
     split = line.split('	')
-    label = split[29]
+    # label = split[29] # connection data model
+    label = split[7] # certificate data model
+
+
     number_label = -1
 
     if 'MALWARE' in label:
         number_label = 1
+        malwares += 1
     if "NORMAL" in label:
         number_label = 0
+        normals += 1
     if number_label == -1:
         print "ERROR: label is -1."
         break
 
     temp = []
-    for i in range(1, 29):
+    for i in range(1, 7): # 29
         temp.append(float(split[i]))
     X.append(temp)
     y.append(number_label)
@@ -76,6 +84,8 @@ for line in all_tuples:
 # normalize X
 norm_X = normalize_data(X)
 print "velikost naseho krasneho celeho X je:", len(X)
+print "Malwares:", malwares
+print "Normals:", normals
 
 # split data by sklearn library
 X_train, X_test, y_train, y_test = train_test_split(norm_X, y, test_size=.2, random_state=35)

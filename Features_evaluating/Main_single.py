@@ -1,4 +1,7 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+"""
 python Main_single.py
 This Main is single, because it processes just one data set. It means there is a folder, where zou can find:
 bro folder, pcap file and binetflow file.

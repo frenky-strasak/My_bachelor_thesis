@@ -1,7 +1,12 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
+
 # My bachelor thesis
 
 ##Introduction
-My bachelor thesis is about detecting malware by machine learning.
+My bachelor thesis is about detecting HTTPS malware by machine learning.
 The main concentration is to ssl communication where is a lot of new 
 challenges how to detect this behaviour. This thesis is related with
 Stratosphere IPS project and Sebastian Garcia, who is leader of this 

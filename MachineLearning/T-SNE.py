@@ -1,4 +1,8 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
+"""
 python T-SNE.py c:\Users\frenk\Documents\Skola\Bachelor_thesis\My_bachelor_thesis\MachineLearning\Experiment_results\2017_04_20_2127conn\
 """
 
@@ -18,10 +22,9 @@ import sys
 """
 ------------------ Load train data ----------------------------------
 """
-final_path = "Final_Experiment\\DividedData\\" + "features_version_1\\"
+final_path = "Final_Experiment\\DividedData\\" + "cert_data_model\\"
 
 X_train, X_test, y_train, y_test = Get_normalize_data.get_all_data(final_path)
-
 
 
 
@@ -77,19 +80,19 @@ X_tsne = tsne.fit_transform(X)
 
 # plot all data as 1 and 0
 plot_embedding(False, X_tsne,
-               "T-SNE - Train data + Test Data") #(time %.2fs)" % (time() - t0))
+               "T-SNE - all certificates") #(time %.2fs)" % (time() - t0))
 # plot all data as 1 and 0 with color test data and black train data
-plot_embedding(True, X_tsne, "T-SNE Train data + Test Data")
+# plot_embedding(True, X_tsne, "T-SNE Train data + Test Data")
+#
+# # plot train data
+# plot_embedding(False, X_tsne[:len(X_train)], "T-SNE Train data")
+# # plot train data
+# plot_embedding(False, X_tsne[len(X_train):], "T-SNE Test Data")
 
-# plot train data
-plot_embedding(False, X_tsne[:len(X_train)], "T-SNE Train data")
-# plot train data
-plot_embedding(False, X_tsne[len(X_train):], "T-SNE Test Data")
-
-Get_normalize_data.write_to_file("X_train.txt", X_tsne[:len(X_train)])
-Get_normalize_data.write_to_file("y_train.txt", y[:len(X_train)])
-
-Get_normalize_data.write_to_file("X_test.txt", X_tsne[len(X_train):])
-Get_normalize_data.write_to_file("y_test.txt", y[len(X_train):])
+# Get_normalize_data.write_to_file("X_train.txt", X_tsne[:len(X_train)])
+# Get_normalize_data.write_to_file("y_train.txt", y[:len(X_train)])
+#
+# Get_normalize_data.write_to_file("X_test.txt", X_tsne[len(X_train):])
+# Get_normalize_data.write_to_file("y_test.txt", y[len(X_train):])
 
 plt.show()

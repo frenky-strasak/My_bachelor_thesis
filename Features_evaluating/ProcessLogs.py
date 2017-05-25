@@ -1,4 +1,7 @@
 """
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+"""
 This file goes into logs file and creates "connection 4-tuples" objects.
 """
 from PrintManager import __PrintManager__
@@ -225,6 +228,7 @@ class ProcessLogs(EvaluateData):
                         except:
                             self.connection_4_tuples[connection_index].add_not_ssl_flow(line, label)
                             not_ssl_conn += 1
+                            # print line
                 except:
                     # Connections which are normal or botnet but they don't have ssl 4-tuple object.
                     pass

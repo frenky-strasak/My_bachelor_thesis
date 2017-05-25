@@ -183,7 +183,15 @@ def get_data_from_file(path, file_name):
                         temp[26],
                         # temp[27]
             ]
+            # features = [
+                # temp[0],
+                # temp[1],
+                # temp[2],
+                # temp[3],
+                # temp[4],
+                # temp[5],
 
+            # ]
             data.append(features)
     return data
 

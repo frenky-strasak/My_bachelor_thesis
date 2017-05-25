@@ -1,3 +1,7 @@
+"""
+https://github.com/frenky-strasak/My_bachelor_thesis
+"""
+
 import Get_normalize_data
 import DetectionMethods
 from xgboost import XGBClassifier
@@ -25,17 +29,31 @@ np_X_train, np_X_test, np_y_train, np_y_test = np.array(X_train), np.array(X_tes
 Define model
 """
 # binary:logistic - logistic regression for binary classification, output probability
-model = XGBClassifier(learning_rate =0.1,
-     n_estimators=1000,
-     max_depth=10,
-     min_child_weight=1,
-     gamma=0,
-     subsample=0.8,
-     colsample_bytree=0.8,
-     objective= 'binary:logistic',
-     nthread=4,
-     scale_pos_weight=1,
-     seed=27)
+# model = XGBClassifier(learning_rate =0.1,
+     # n_estimators=1000,
+     # max_depth=10,
+     # min_child_weight=1,
+     # gamma=0,
+     # subsample=0.8,
+     # colsample_bytree=0.8,
+     # objective= 'binary:logistic',
+     # nthread=4,
+     # scale_pos_weight=1,
+     # seed=27)
+	 
+# title = "Learning Curves ( XGBoost s)"
+model = XGBClassifier(
+	learning_rate=0.1,
+  n_estimators=1000,
+  max_depth=3,
+  min_child_weight=5,
+  gamma=0.1,
+  subsample=0.8,
+  colsample_bytree=0.8,
+  objective='binary:logistic',
+  nthread=4,
+  scale_pos_weight=1,
+  seed=27)
 
 """
 Crossvalidation
